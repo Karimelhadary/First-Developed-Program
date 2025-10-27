@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Task Management System — Onboarding</title>
+  <link rel="stylesheet" href="onboarding.css" />
+</head>
+<body>
+  <input id="theme-toggle" type="checkbox" class="theme-toggle" />
+  <div class="app">
+    <header class="topbar">
+      <a class="back" href="login.html">← Back</a>
+      <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
+    </header>
+
+    <main class="wrap">
+      <section class="card panel">
+        <h1>How are you feeling today?</h1>
+        <p class="muted">Pick a mood to personalize your suggestions.</p>
+
+        <div class="moods">
+          <label class="mood energetic">
+            <input type="radio" name="m" /> <span>⚡ Energetic</span>
+          </label>
+          <label class="mood focused">
+            <input type="radio" name="m" checked /> <span>🎯 Focused</span>
+          </label>
+          <label class="mood calm">
+            <input type="radio" name="m" /> <span>😊 Calm</span>
+          </label>
+          <label class="mood creative">
+            <input type="radio" name="m" /> <span>✨ Creative</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <a class="btn ghost" href="splash.html">Skip</a>
+          <a class="btn primary" href="dashboard.html">Continue</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

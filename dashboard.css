@@ -1,0 +1,177 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: linear-gradient(140deg, #f0faff, #f3e8ff);
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: white;
+  padding: 18px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  font-size: 22px;
+  color: #333;
+}
+
+header p {
+  color: #666;
+  font-size: 14px;
+}
+
+main {
+  flex: 1;
+  width: 90%;
+  max-width: 950px;
+  margin: 25px auto;
+}
+
+.mood-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 25px;
+}
+
+.mood-bar button {
+  flex: 1;
+  min-width: 100px;
+  background: #edf7f4;
+  border: 1px solid #bcd6cc;
+  border-radius: 20px;
+  padding: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #333;
+}
+
+.mood-bar button.active {
+  background: #5c45ff;
+  color: white;
+  border-color: #5c45ff;
+}
+
+.mood-bar button:hover {
+  background: #dceffd;
+}
+
+.tasks {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  margin-bottom: 25px;
+}
+
+.tasks h3 {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.task-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task {
+  background: #f6f6ff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  transition: 0.2s;
+}
+
+.task:hover {
+  background: #ebe9ff;
+}
+
+.task .meta {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.task .title {
+  font-weight: bold;
+  color: #222;
+}
+
+.task .sub {
+  color: #666;
+  font-size: 14px;
+}
+
+.task .pill {
+  background: #e9efff;
+  color: #4a5cff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actions .btn {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.actions .btn.add {
+  background: #5c45ff;
+  color: white;
+}
+
+.actions .btn.add:hover {
+  background: #4328d6;
+}
+
+.actions .btn.hollow {
+  border: 2px solid #5c45ff;
+  color: #5c45ff;
+}
+
+.actions .btn.hollow:hover {
+  background: #5c45ff;
+  color: white;
+}
+
+@media (max-width: 650px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .mood-bar {
+    flex-direction: column;
+  }
+  .task {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

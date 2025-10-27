@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Task Management System — Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <input id="theme-toggle" type="checkbox" class="theme-toggle" />
+  <div class="app">
+    <header class="top">
+      <div class="greeting">
+        <h1>Good afternoon!</h1>
+        <p class="muted">How are you feeling today?</p>
+      </div>
+      <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
+    </header>
+
+    <main class="content">
+      <!-- Mood chips -->
+      <div class="mood-bar card">
+        <button class="chip"><span>⚡</span> Energetic</button>
+        <button class="chip active"><span>🎯</span> Focused</button>
+        <button class="chip"><span>😊</span> Calm</button>
+        <button class="chip"><span>✨</span> Creative</button>
+      </div>
+
+      <!-- Task panel -->
+      <section class="tasks card">
+        <h3>Suggested for your mood</h3>
+        <ul class="task-list">
+          <li class="task">
+            <span class="box"></span>
+            <div class="meta">
+              <div class="title">Review code pull requests</div>
+              <div class="sub">Check team submissions</div>
+            </div>
+            <span class="pill">🎯</span>
+          </li>
+          <li class="task">
+            <span class="box"></span>
+            <div class="meta">
+              <div class="title">Draft sprint goals</div>
+              <div class="sub">Outline key outcomes</div>
+            </div>
+            <span class="pill">🎯</span>
+          </li>
+        </ul>
+
+        <h4 class="dim">Other tasks</h4>
+        <ul class="task-list muted-list">
+          <li class="task">
+            <span class="box soft"></span>
+            <div class="meta">
+              <div class="title">Morning meditation</div>
+            </div>
+            <span class="pill soft">😊</span>
+          </li>
+          <li class="task">
+            <span class="box soft"></span>
+            <div class="meta">
+              <div class="title">Design new feature mockups</div>
+            </div>
+            <span class="pill soft">✨</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a class="btn add" href="onboarding.html">+ Add Task</a>
+        <a class="btn hollow" href="splash.html">⏱️ Start Focus Timer</a>
+        <a class="btn hollow" href="splash.html">📈 View Insights</a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
