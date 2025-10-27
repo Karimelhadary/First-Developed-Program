@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task List — Task Management System</title>
+  <link rel="stylesheet" href="tasklist.css" />
+</head>
+<body>
+  <header>
+    <a href="dashboard.html" class="back">← Dashboard</a>
+    <h2>All Tasks</h2>
+  </header>
+
+  <main class="container">
+    <div class="filters">
+      <label>Sort by:
+        <select>
+          <option>Due Date</option>
+          <option>Importance</option>
+          <option>Complexity</option>
+        </select>
+      </label>
+    </div>
+
+    <ul class="task-list">
+      <li>
+        <div class="info">
+          <h3>Finish Design Mockups</h3>
+          <p>Due: Tomorrow</p>
+        </div>
+        <div class="actions">
+          <a href="addtask.html" class="edit">✏️</a>
+          <a href="#" class="delete">🗑️</a>
+        </div>
+      </li>
+
+      <li>
+        <div class="info">
+          <h3>Prepare Presentation</h3>
+          <p>Due: Friday</p>
+        </div>
+        <div class="actions">
+          <a href="addtask.html" class="edit">✏️</a>
+          <a href="#" class="delete">🗑️</a>
+        </div>
+      </li>
+    </ul>
+
+    <a href="addtask.html" class="btn primary">+ Add Task</a>
+  </main>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Task — Task Management System</title>
+  <link rel="stylesheet" href="addtask.css" />
+</head>
+<body>
+  <header>
+    <a href="dashboard.html" class="back">← Dashboard</a>
+    <h2>Add New Task</h2>
+  </header>
+
+  <main class="container">
+    <form class="task-form" action="dashboard.html">
+      <label>Task Title
+        <input type="text" placeholder="Enter task name" required />
+      </label>
+
+      <label>Description
+        <textarea placeholder="Add notes..."></textarea>
+      </label>
+
+      <label>Due Date
+        <input type="date" required />
+      </label>
+
+      <label>Importance / Urgency
+        <select>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+      </label>
+
+      <label>Complexity
+        <input type="range" min="1" max="5" />
+      </label>
+
+      <label>Energy Level (for later)
+        <input type="range" min="1" max="5" />
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn primary">Save Task</button>
+        <a href="dashboard.html" class="btn ghost">Cancel</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
