@@ -7,6 +7,21 @@
   <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
+  <!-- site header / main navigation -->
+  <header class="site-header">
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html" class="logo">TaskManager</a>
+      <ul>
+        <li><a href="dashboard.html" class="active" aria-current="page">Dashboard</a></li>
+        <li><a href="tasks.html">Tasks</a></li>
+        <li><a href="insights.html">Insights</a></li>
+        <li><a href="timer.html">Timer</a></li>
+        <li><a href="addtask.html">Add Task</a></li>
+        <li><a href="settings.html">Settings</a></li>
+      </ul>
+    </nav>
+  </header>
+
   <input id="theme-toggle" type="checkbox" class="theme-toggle" />
   <div class="app">
     <header class="top">
@@ -67,13 +82,24 @@
         </ul>
       </section>
 
-      <!-- Actions -->
+      <!-- Actions: connect to addtask, timer, insights and tasklist -->
       <div class="actions">
-        <a class="btn add" href="onboarding.html">+ Add Task</a>
-        <a class="btn hollow" href="splash.html">⏱️ Start Focus Timer</a>
-        <a class="btn hollow" href="splash.html">📈 View Insights</a>
+        <a class="btn add" href="addtask.html">+ Add Task</a>
+        <a class="btn hollow" href="timer.html">⏱️ Start Focus Timer</a>
+        <a class="btn hollow" href="insights.html">📈 View Insights</a>
+        <a class="btn hollow" href="tasklist.html">📋 View All Tasks</a>
       </div>
     </main>
   </div>
+
+  <!-- footer with quick navigation -->
+  <footer class="site-footer">
+    <div class="flow-links">
+      <a href="tasks.html" class="prev">← Task List</a>
+      <a href="dashboard.html" class="home">Dashboard</a>
+      <a href="insights.html" class="next">Insights →</a>
+    </div>
+    <p>&copy; 2025 TaskManager</p>
+  </footer>
 </body>
 </html>
