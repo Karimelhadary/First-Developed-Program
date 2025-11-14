@@ -1,27 +1,26 @@
-# app.py
-from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, abort
 
 app = Flask(__name__)
 
 # ------------------------
-# Simple in-memory "database"
+# In-memory "database"
 # ------------------------
 
 class Task:
-    def __init__(self, id, title, description, due_date, importance,
-                 complexity, energy, completed=False):
+    def __init__(self, id, title, description, due_date,
+                 importance, complexity, energy, completed=False):
         self.id = id
         self.title = title
         self.description = description
-        self.due_date = due_date          # string "YYYY-MM-DD"
-        self.importance = importance      # "Low", "Medium", "High"
-        self.complexity = complexity      # int 1–5
-        self.energy = energy              # int 1–5
-        self.completed = completed        # bool
+        self.due_date = due_date        # "YYYY-MM-DD" string
+        self.importance = importance    # "Low" | "Medium" | "High"
+        self.complexity = complexity    # int 1–5
+        self.energy = energy            # int 1–5
+        self.completed = completed      # bool
 
-tasks = []
-_next_id = 1
+
+tasks = []          # list[Task]
+_next_id = 1        # simple counter
 
 
 def get_next_id():
@@ -31,7 +30,7 @@ def get_next_id():
     return current
 
 
-def find_task(task_id: int) -> Task | None:
+def find_task(task_id: int):
     for t in tasks:
         if t.id == task_id:
             return t
@@ -39,88 +38,85 @@ def find_task(task_id: int) -> Task | None:
 
 
 # ------------------------
-# Routes: Splash & auth
+# Routes: Splash / Home
 # ------------------------
 
 @app.route("/")
-def index():
-    return render_template("splash.html")
-
 @app.route("/splash")
+@app.route("/splash.html")   # so /splash.html also works
 def splash():
     return render_template("splash.html")
 
 
+# ------------------------
+# Routes: Login & Onboarding
+# ------------------------
+
 @app.route("/login", methods=["GET", "POST"])
+@app.route("/login.html", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
-
-        # TODO: real authentication
-        # For now, accept anything and go to onboarding
+        # no real auth for now – just go to onboarding
         if not email or not password:
-            # very basic "validation"
             return render_template("login.html", error="Please enter email and password.")
-
         return redirect(url_for("onboarding"))
-
-    # GET
     return render_template("login.html")
 
 
 @app.route("/onboarding", methods=["GET", "POST"])
+@app.route("/onboarding.html", methods=["GET", "POST"])
 def onboarding():
     if request.method == "POST":
         mood = request.form.get("mood", "focused")
+        # pass mood as query param to dashboard (optional)
         return redirect(url_for("dashboard", mood=mood))
 
     selected_mood = request.args.get("mood", "focused")
     return render_template("onboarding.html", selected_mood=selected_mood)
 
 
-# Routes: Dashboard & tasks
+# ------------------------
+# Routes: Dashboard
+# ------------------------
 
 @app.route("/dashboard")
+@app.route("/dashboard.html")
 def dashboard():
     mood = request.args.get("mood", "focused")
-
-    # Here you could do smart filtering based on mood.
-    # For now, just show all tasks and pass mood to template.
-    return render_template("dashboard.html", mood=mood, tasks=tasks)
+    # For now: just show all tasks; you could filter by mood later.
+    return render_template("dashboard.html", tasks=tasks, mood=mood)
 
 
-@app.route("/tasks")
+# ------------------------
+# Routes: Tasks (list, add, edit, delete)
+# ------------------------
+
+@app.route("/tasklist")
+@app.route("/tasklist.html")
 def task_list():
-    sort_by = request.args.get("sort_by", "due_date")
-
-    def sort_key(task: Task):
-        if sort_by == "importance":
-            order = {"Low": 0, "Medium": 1, "High": 2}
-            return order.get(task.importance, 0)
-        if sort_by == "complexity":
-            return task.complexity
-        # default: due_date as string
-        return task.due_date or ""
-
-    sorted_tasks = sorted(tasks, key=sort_key)
-    return render_template("tasklist.html", tasks=sorted_tasks, sort_by=sort_by)
+    # later you can add sort_by from query params
+    return render_template("tasklist.html", tasks=tasks)
 
 
-@app.route("/tasks/new", methods=["GET", "POST"])
+@app.route("/addtask", methods=["GET", "POST"])
+@app.route("/addtask.html", methods=["GET", "POST"])
 def add_task():
     if request.method == "POST":
         title = request.form.get("title")
         description = request.form.get("description", "")
         due_date = request.form.get("due_date")
         importance = request.form.get("importance", "Low")
-        complexity = request.form.get("complexity", "1")
-        energy = request.form.get("energy", "1")
+        complexity = int(request.form.get("complexity", 1))
+        energy = int(request.form.get("energy", 1))
 
         if not title or not due_date:
-            # re-render with error
+            # re-render with an error (optional)
             return render_template(
                 "addtask.html",
+                task=None,
+                editing=False,
                 error="Title and due date are required.",
             )
 
@@ -130,25 +126,14 @@ def add_task():
             description=description,
             due_date=due_date,
             importance=importance,
-            complexity=int(complexity),
-            energy=int(energy),
+            complexity=complexity,
+            energy=energy,
         )
         tasks.append(new_task)
         return redirect(url_for("dashboard"))
 
-    # GET
-    return render_template("addtask.html")
-
-
-@app.route("/tasks/<int:task_id>/delete", methods=["POST"])
-def delete_task(task_id: int):
-    task = find_task(task_id)
-    if task is None:
-        abort(404)
-
-    tasks.remove(task)
-    # redirect back to the page that sent us here, or task list as fallback
-    return redirect(request.referrer or url_for("task_list"))
+    # GET – new task
+    return render_template("addtask.html", task=None, editing=False)
 
 
 @app.route("/tasks/<int:task_id>/edit", methods=["GET", "POST"])
@@ -166,16 +151,31 @@ def edit_task(task_id: int):
         task.energy = int(request.form.get("energy", task.energy))
         return redirect(url_for("task_list"))
 
+    # GET – edit form prefilled
     return render_template("addtask.html", task=task, editing=True)
 
 
-# Routes: Insights & timer
+@app.route("/tasks/<int:task_id>/delete", methods=["POST"])
+def delete_task(task_id: int):
+    task = find_task(task_id)
+    if task is None:
+        abort(404)
+
+    tasks.remove(task)
+    # go back to task list (or previous page)
+    return redirect(url_for("task_list"))
+
+
+# ------------------------
+# Routes: Insights, Timer & Break
+# ------------------------
 
 @app.route("/insights")
+@app.route("/insights.html")
 def insights():
     total = len(tasks)
     completed = sum(1 for t in tasks if t.completed)
-    # For now, fake focus time
+    # dummy focus time for now
     focus_time = "1h 25m"
 
     return render_template(
@@ -187,15 +187,20 @@ def insights():
 
 
 @app.route("/timer")
+@app.route("/timer.html")
 def timer():
     return render_template("timer.html")
 
 
 @app.route("/break")
+@app.route("/break.html")
 def break_page():
     return render_template("break.html")
 
-# Entry point
+
+# ------------------------
+# Entrypoint
+# ------------------------
 
 if __name__ == "__main__":
     app.run(debug=True)

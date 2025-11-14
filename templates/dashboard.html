@@ -32,22 +32,18 @@
       <section class="tasks card">
         <h3>Suggested for your mood</h3>
         <ul class="task-list">
+          {% for t in tasks[:5] %}
           <li class="task">
             <span class="box"></span>
             <div class="meta">
-              <div class="title">Review code pull requests</div>
-              <div class="sub">Check team submissions</div>
+              <div class="title">{{ t.title }}</div>
+              <div class="sub">{{ t.description }}</div>
             </div>
-            <span class="pill">🎯</span>
+            <span class="pill">{{ t.importance }}</span>
           </li>
-          <li class="task">
-            <span class="box"></span>
-            <div class="meta">
-              <div class="title">Draft sprint goals</div>
-              <div class="sub">Outline key outcomes</div>
-            </div>
-            <span class="pill">🎯</span>
-          </li>
+          {% else %}
+          <li class="task"><div class="meta"><div class="title">No suggested tasks</div></div></li>
+          {% endfor %}
         </ul>
 
         <h4 class="dim">Other tasks</h4>
@@ -71,10 +67,10 @@
 
       <!-- Actions: connect to addtask, timer, insights and tasklist -->
       <div class="actions">
-        <a class="btn add" href="addtask.html">+ Add Task</a>
-        <a class="btn hollow" href="timer.html">⏱️ Start Focus Timer</a>
-        <a class="btn hollow" href="insights.html">📈 View Insights</a>
-        <a class="btn hollow" href="tasklist.html">📋 View All Tasks</a>
+        <a class="btn add" href="{{ url_for('add_task') }}">+ Add Task</a>
+        <a class="btn hollow" href="{{ url_for('timer') }}">⏱️ Start Focus Timer</a>
+        <a class="btn hollow" href="{{ url_for('insights') }}">📈 View Insights</a>
+        <a class="btn hollow" href="{{ url_for('task_list') }}">📋 View All Tasks</a>
       </div>
     </main>
   </div>
@@ -82,9 +78,9 @@
   <!-- footer with quick navigation -->
   <footer class="site-footer">
     <div class="flow-links">
-      <a href="tasklist.html" class="prev">← Task List</a>
-      <a href="dashboard.html" class="home">Dashboard</a>
-      <a href="insights.html" class="next">Insights →</a>
+      <a href="{{ url_for('task_list') }}" class="prev">← Task List</a>
+      <a href="{{ url_for('dashboard') }}" class="home">Dashboard</a>
+      <a href="{{ url_for('insights') }}" class="next">Insights →</a>
     </div>
     <p>&copy; 2025 TaskManager</p>
   </footer>

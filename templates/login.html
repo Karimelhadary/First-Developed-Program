@@ -13,19 +13,19 @@
       <h2>Welcome back</h2>
       <p class="muted">Sign in to continue to FlowTask</p>
 
-      <form class="form" action="onboarding.html">
+      <form class="form" action="{{ url_for('login') }}" method="post">
         <label>Email
-          <input type="email" placeholder="you@example.com" required>
+          <input name="email" type="email" placeholder="you@example.com" required>
         </label>
         <label>Password
-          <input type="password" placeholder="••••••" required>
+          <input name="password" type="password" placeholder="••••••" required>
         </label>
         <button class="btn" type="submit">Sign in</button>
       </form>
 
       <div class="divider">or</div>
-      <a class="btn ghost" href="onboarding.html">Sign in with Google (mock)</a>
-      <p class="small">New? <a href="onboarding.html">Create account</a></p>
+  <a class="btn ghost" href="{{ url_for('onboarding') }}">Sign in with Google (mock)</a>
+  <p class="small">New? <a href="{{ url_for('onboarding') }}">Create account</a></p>
     </div>
   </main>
 </body>
