@@ -10,4 +10,4 @@ def onboarding():
         return redirect(url_for("dashboard_bp.dashboard", mood=mood))
     
     selected_mood = request.args.get("mood", "focused")
-    return render_template("onboarding.html", selected_mood=selected_mood)
+    return render_template("/templates/onboarding.html", selected_mood=selected_mood)

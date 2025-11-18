@@ -10,7 +10,7 @@ def login():
         password = request.form.get("password")
 
         if not email or not password:
-            return render_template("login.html", error="Please enter email and password.")
+            return render_template("/templates/login.html", error="Please enter email and password.")
         return redirect(url_for("onboarding_bp.onboarding"))
 
-    return render_template("login.html")
+    return render_template("/templates/login.html")

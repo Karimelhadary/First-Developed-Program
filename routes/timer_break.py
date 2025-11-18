@@ -10,4 +10,4 @@ def timer():
 @timer_break_bp.route("/break")
 @timer_break_bp.route("/break.html")
 def break_page():
-    return render_template("break.html")
+    return render_template("/templates/break.html")
