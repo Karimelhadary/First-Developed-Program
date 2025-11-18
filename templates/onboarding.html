@@ -10,11 +10,7 @@
   <input id="theme-toggle" type="checkbox" class="theme-toggle" />
   <div class="app">
     <header class="topbar">
-<<<<<<< HEAD
-      <a class="back" href="login.html">← Back</a>
-=======
       <a class="back" href="{{ url_for('login') }}">← Back</a>
->>>>>>> b17fd9aa1a51bbe2b512dde006969ed6fce05662
       <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
     </header>
 
@@ -23,27 +19,6 @@
         <h1>How are you feeling today?</h1>
         <p class="muted">Pick a mood to personalize your suggestions.</p>
 
-<<<<<<< HEAD
-        <div class="moods">
-          <label class="mood energetic">
-            <input type="radio" name="m" /> <span>⚡ Energetic</span>
-          </label>
-          <label class="mood focused">
-            <input type="radio" name="m" checked /> <span>🎯 Focused</span>
-          </label>
-          <label class="mood calm">
-            <input type="radio" name="m" /> <span>😊 Calm</span>
-          </label>
-          <label class="mood creative">
-            <input type="radio" name="m" /> <span>✨ Creative</span>
-          </label>
-        </div>
-
-        <div class="actions">
-          <a class="btn ghost" href="splash.html">Skip</a>
-          <a class="btn primary" href="dashboard.html">Continue</a>
-        </div>
-=======
         <form action="{{ url_for('onboarding') }}" method="post">
           <div class="moods">
             <label class="mood energetic">
@@ -65,7 +40,6 @@
             <button class="btn primary" type="submit">Continue</button>
           </div>
         </form>
->>>>>>> b17fd9aa1a51bbe2b512dde006969ed6fce05662
       </section>
     </main>
   </div>
