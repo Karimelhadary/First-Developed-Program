@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Task Management System — Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="/static/dashboard.css" />
 </head>
 <body>
   <input id="theme-toggle" type="checkbox" class="theme-toggle" />
@@ -69,7 +69,7 @@
 
       <!-- Actions -->
       <div class="actions">
-        <a class="btn add" href="onboarding.html">+ Add Task</a>
+        <a class="btn add" href="{{ url_for('add_task') }}">+ Add Task</a>
         <a class="btn hollow" href="splash.html">⏱️ Start Focus Timer</a>
         <a class="btn hollow" href="splash.html">📈 View Insights</a>
       </div>
