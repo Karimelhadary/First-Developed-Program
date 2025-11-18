@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
-from routes import tasks
+from routes.data import tasks
+
 
 insights_bp = Blueprint("insights_bp", __name__)
 

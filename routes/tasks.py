@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, abort
-from routes import tasks, Task, get_next_id, find_task
+from routes.data import Task, tasks, get_next_id, find_task
+
+
 
 tasks_bp = Blueprint("tasks_bp", __name__)
 

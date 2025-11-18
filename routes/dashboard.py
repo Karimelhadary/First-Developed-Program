@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
-from routes import tasks
+from routes.data import tasks
+
 
 dashboard_bp = Blueprint("dashboard_bp", __name__)
 
