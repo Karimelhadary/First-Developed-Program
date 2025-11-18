@@ -1,9 +1,10 @@
-from flask import render_template, request
-from app import app
-from data import tasks
+from flask import Blueprint, render_template, request
+from routes import tasks
 
-@app.route("/dashboard")
-@app.route("/dashboard.html")
+dashboard_bp = Blueprint("dashboard_bp", __name__)
+
+@dashboard_bp.route("/dashboard")
+@dashboard_bp.route("/dashboard.html")
 def dashboard():
     mood = request.args.get("mood", "focused")
     return render_template("dashboard.html", tasks=tasks, mood=mood)
