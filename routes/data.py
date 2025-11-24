@@ -13,11 +13,13 @@ class Task:
         self.completed = completed
 
 
+# In-memory “database”
 tasks = []
 _next_id = 1
 
 
 def get_next_id():
+    """Return a new unique task id."""
     global _next_id
     task_id = _next_id
     _next_id += 1
@@ -25,6 +27,7 @@ def get_next_id():
 
 
 def find_task(task_id: int):
+    """Find a task by id or return None."""
     for t in tasks:
         if t.id == task_id:
             return t

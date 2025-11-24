@@ -7,7 +7,8 @@ timer_break_bp = Blueprint("timer_break_bp", __name__)
 def timer():
     return render_template("timer.html")
 
+
 @timer_break_bp.route("/break")
 @timer_break_bp.route("/break.html")
 def break_page():
-    return render_template("/templates/break.html")
+    return render_template("break.html")

@@ -8,7 +8,7 @@
 </head>
 <body>
   <header>
-    <a href="{{ url_for('dashboard') }}" class="back">← Dashboard</a>
+    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
     <h2>Focus Timer</h2>
   </header>
 
@@ -22,7 +22,7 @@
       <button class="btn ghost">Pause</button>
       <button class="btn ghost">Reset</button>
     </div>
-  <a href="{{ url_for('break_page') }}" class="btn secondary">Take a Break</a>
+    <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn secondary">Take a Break</a>
   </main>
 </body>
 </html>

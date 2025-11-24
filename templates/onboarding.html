@@ -10,7 +10,7 @@
   <input id="theme-toggle" type="checkbox" class="theme-toggle" />
   <div class="app">
     <header class="topbar">
-      <a class="back" href="{{ url_for('login') }}">← Back</a>
+      <a class="back" href="{{ url_for('login_bp.login') }}">← Back</a>
       <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
     </header>
 
@@ -19,7 +19,7 @@
         <h1>How are you feeling today?</h1>
         <p class="muted">Pick a mood to personalize your suggestions.</p>
 
-        <form action="{{ url_for('onboarding') }}" method="post">
+        <form action="{{ url_for('onboarding_bp.onboarding') }}" method="post">
           <div class="moods">
             <label class="mood energetic">
               <input type="radio" name="mood" value="energetic" /> <span>⚡ Energetic</span>
@@ -36,14 +36,14 @@
           </div>
 
           <div class="actions">
-            <a class="btn ghost" href="{{ url_for('splash') }}">Skip</a>
+            <a class="btn ghost" href="{{ url_for('splash_bp.splash') }}">Skip</a>
             <button class="btn primary" type="submit">Continue</button>
           </div>
         </form>
       </section>
     </main>
   </div>
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script src="{{ url_for('static', filename='onboarding.js') }}"></script>
 </body>
 </html>
-<script src="{{ url_for('static', filename='main.js') }}"></script>
-<script src="{{ url_for('static', filename='onboarding.js') }}"></script>

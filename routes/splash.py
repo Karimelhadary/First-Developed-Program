@@ -6,4 +6,4 @@ splash_bp = Blueprint("splash_bp", __name__)
 @splash_bp.route("/splash")
 @splash_bp.route("/splash.html")
 def splash():
-    return render_template("/templates/splash.html")
+    return render_template("splash.html")

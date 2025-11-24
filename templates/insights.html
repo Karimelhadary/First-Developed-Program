@@ -8,15 +8,15 @@
 </head>
 <body>
   <header>
-    <a href="{{ url_for('dashboard') }}" class="back">← Dashboard</a>
+    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
     <h2>Your Insights</h2>
   </header>
 
   <main class="container">
     <section class="summary">
       <h3>Today's Summary</h3>
-      <p>Tasks completed: <strong>3/5</strong></p>
-      <p>Focus time: <strong>1h 25m</strong></p>
+      <p>Tasks completed: <strong>{{ completed_tasks }}/{{ total_tasks }}</strong></p>
+      <p>Focus time: <strong>{{ focus_time }}</strong></p>
       <p>Mood trend: 🎯 Focused → 😊 Calm</p>
     </section>
 

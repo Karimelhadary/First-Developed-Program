@@ -10,7 +10,7 @@
   <input id="theme-toggle" type="checkbox" class="theme-toggle" aria-label="Toggle dark mode" />
   <div class="app">
     <header class="topbar">
-  <a class="brand" href="{{ url_for('splash') }}">Task Management System</a>
+      <a class="brand" href="{{ url_for('splash_bp.splash') }}">Task Management System</a>
       <label class="toggle" for="theme-toggle" title="Theme">🌞<span></span>🌙</label>
     </header>
 
@@ -19,8 +19,8 @@
         <h1>Organize your day by mood.</h1>
         <p>Focused, Creative, or Low Energy — pick what fits and get the right tasks suggested instantly.</p>
         <div class="cta-row">
-          <a class="btn primary" href="{{ url_for('login') }}">Get Started</a>
-          <a class="btn ghost" href="{{ url_for('onboarding') }}">Preview Onboarding</a>
+          <a class="btn primary" href="{{ url_for('login_bp.login') }}">Get Started</a>
+          <a class="btn ghost" href="{{ url_for('onboarding_bp.onboarding') }}">Preview Onboarding</a>
         </div>
       </section>
     </main>
