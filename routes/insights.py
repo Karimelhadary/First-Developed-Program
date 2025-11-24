@@ -1,18 +1,15 @@
-from flask import Blueprint, render_template
-from routes.data import tasks
+from flask import Blueprint, render_template, current_app
 
 insights_bp = Blueprint("insights_bp", __name__)
 
 @insights_bp.route("/insights")
-@insights_bp.route("/insights.html")
 def insights():
-    total = len(tasks)
-    completed = sum(1 for t in tasks if t.completed)
-    focus_time = "1h 25m"  # placeholder
+
+    total = current_app.tasks.count_documents({})
+    completed = current_app.tasks.count_documents({"completed": True})
 
     return render_template(
         "insights.html",
         total_tasks=total,
-        completed_tasks=completed,
-        focus_time=focus_time,
+        completed_tasks=completed
     )

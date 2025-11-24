@@ -1,87 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Task Management System — Dashboard</title>
-  <link rel="stylesheet" href="/static/dashboard.css" />
+  <title>Dashboard — Task Manager</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
 <body>
-  <input id="theme-toggle" type="checkbox" class="theme-toggle" />
-  <div class="app">
-    <header class="top">
-      <div class="greeting">
-        <h1>Good afternoon!</h1>
-        <p class="muted">How are you feeling today?</p>
-      </div>
-      <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
-    </header>
 
-    <main class="content">
-      <div class="mood-bar card">
-        <button class="chip"><span>⚡</span> Energetic</button>
-        <button class="chip active"><span>🎯</span> Focused</button>
-        <button class="chip"><span>😊</span> Calm</button>
-        <button class="chip"><span>✨</span> Creative</button>
-      </div>
+<input id="theme-toggle" type="checkbox" class="theme-toggle" />
 
-      <section class="tasks card">
-        <h3>Suggested for your mood</h3>
-        <ul class="task-list">
-          {% for t in tasks[:5] %}
-          <li class="task">
-            <span class="box"></span>
-            <div class="meta">
-              <div class="title">{{ t.title }}</div>
-              <div class="sub">{{ t.description }}</div>
-            </div>
-            <span class="pill">{{ t.importance }}</span>
-          </li>
-          {% else %}
-          <li class="task">
-            <div class="meta">
-              <div class="title">No suggested tasks</div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
+<div class="app">
 
-        <h4 class="dim">Other tasks</h4>
-        <ul class="task-list muted-list">
-          <li class="task">
-            <span class="box soft"></span>
-            <div class="meta">
-              <div class="title">Morning meditation</div>
-            </div>
-            <span class="pill soft">😊</span>
-          </li>
-          <li class="task">
-            <span class="box soft"></span>
-            <div class="meta">
-              <div class="title">Design new feature mockups</div>
-            </div>
-            <span class="pill soft">✨</span>
-          </li>
-        </ul>
-      </section>
-
-      <div class="actions">
-        <a class="btn add" href="{{ url_for('tasks_bp.add_task') }}">+ Add Task</a>
-        <a class="btn hollow" href="{{ url_for('timer_break_bp.timer') }}">⏱️ Start Focus Timer</a>
-        <a class="btn hollow" href="{{ url_for('insights_bp.insights') }}">📈 View Insights</a>
-        <a class="btn hollow" href="{{ url_for('tasks_bp.task_list') }}">📋 View All Tasks</a>
-      </div>
-    </main>
+<header class="top">
+  <div class="greeting">
+    <h1>Hello!</h1>
+    <p class="muted">Here are your tasks today.</p>
   </div>
+  <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
+</header>
 
-  <footer class="site-footer">
-    <div class="flow-links">
-      <a href="{{ url_for('tasks_bp.task_list') }}" class="prev">← Task List</a>
-      <a href="{{ url_for('dashboard_bp.dashboard') }}" class="home">Dashboard</a>
-      <a href="{{ url_for('insights_bp.insights') }}" class="next">Insights →</a>
-    </div>
-    <p>&copy; 2025 TaskManager</p>
-  </footer>
-  <script src="{{ url_for('static', filename='main.js') }}"></script>
+<main class="content">
+
+<section class="tasks card">
+  <h3>Your Tasks</h3>
+
+  <ul class="task-list">
+
+    {% for t in tasks %}
+    <li class="task">
+
+      <span class="box"></span>
+
+      <div class="meta">
+        <div class="title">{{ t.title }}</div>
+        <div class="sub">{{ t.description }}</div>
+        <div class="sub">Due: {{ t.due_date }}</div>
+      </div>
+
+      <span class="pill">{{ t.importance }}</span>
+
+    </li>
+    {% else %}
+    <li class="task">
+      <div class="meta">No tasks yet.</div>
+    </li>
+    {% endfor %}
+
+  </ul>
+</section>
+
+<div class="actions">
+  <a class="btn add" href="{{ url_for('tasks_bp.add_task') }}">+ Add Task</a>
+  <a class="btn hollow" href="{{ url_for('timer_break_bp.timer') }}">⏱️ Start Focus Timer</a>
+  <a class="btn hollow" href="{{ url_for('insights_bp.insights') }}">📈 Insights</a>
+  <a class="btn hollow" href="{{ url_for('tasks_bp.task_list') }}">📋 All Tasks</a>
+</div>
+
+</main>
+</div>
+
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+
 </body>
 </html>

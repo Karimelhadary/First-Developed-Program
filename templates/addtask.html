@@ -1,66 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Task — Task Management System</title>
-  <link rel="stylesheet" href="/static/addtask.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ 'Edit Task' if editing else 'Add Task' }} — Task Management System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='addtask.css') }}">
 </head>
 <body>
-  <header>
-    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
-    <h2>Add New Task</h2>
-  </header>
 
-  <main class="container">
-    <form class="task-form"
-          action="{% if editing %}{{ url_for('tasks_bp.edit_task', task_id=task.id) }}{% else %}{{ url_for('tasks_bp.add_task') }}{% endif %}"
-          method="post">
-      <label>Task Title
-        <input name="title" type="text" placeholder="Enter task name" required
-               value="{{ task.title if task else '' }}" />
-      </label>
+<header>
+  <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
+  <h2>{{ 'Edit Task' if editing else 'Add New Task' }}</h2>
+</header>
 
-      <label>Description
-        <textarea name="description" placeholder="Add notes...">{{ task.description if task else '' }}</textarea>
-      </label>
+<main class="container">
+  <form class="task-form" method="POST">
 
-      <label>Due Date
-        <input name="due_date" type="date" required value="{{ task.due_date if task else '' }}" />
-      </label>
+    <label>Title
+      <input type="text" name="title" required 
+             value="{{ task.title if editing else '' }}">
+    </label>
 
-      <label>Importance / Urgency
-        <select name="importance">
-          <option value="Low" {% if task and task.importance=='Low' %}selected{% endif %}>Low</option>
-          <option value="Medium" {% if task and task.importance=='Medium' %}selected{% endif %}>Medium</option>
-          <option value="High" {% if task and task.importance=='High' %}selected{% endif %}>High</option>
-        </select>
-      </label>
+    <label>Description
+      <textarea name="description">{{ task.description if editing else '' }}</textarea>
+    </label>
 
-      <label>Complexity
-        <input name="complexity" type="range" min="1" max="5"
-               value="{{ task.complexity if task else 1 }}" />
-      </label>
+    <label>Due Date
+      <input type="date" name="due_date" required
+             value="{{ task.due_date if editing else '' }}">
+    </label>
 
-      <label>Energy Level (for later)
-        <input name="energy" type="range" min="1" max="5"
-               value="{{ task.energy if task else 1 }}" />
-      </label>
+    <label>Importance
+      <select name="importance">
+        <option {{ 'selected' if editing and task.importance=='Low' }}>Low</option>
+        <option {{ 'selected' if editing and task.importance=='Medium' }}>Medium</option>
+        <option {{ 'selected' if editing and task.importance=='High' }}>High</option>
+      </select>
+    </label>
 
-      <div class="actions">
-        <button type="submit" class="btn primary">Save Task</button>
-        <a href="{{ url_for('dashboard_bp.dashboard') }}" class="btn ghost">Cancel</a>
-      </div>
-    </form>
+    <label>Complexity
+      <input type="range" name="complexity" min="1" max="5"
+             value="{{ task.complexity if editing else '1' }}">
+    </label>
 
-    {% if editing %}
-      <form action="{{ url_for('tasks_bp.delete_task', task_id=task.id) }}"
-            method="post"
-            onsubmit="return confirm('Delete this task?');"
-            style="margin-top:1rem;">
-        <button type="submit" class="btn" style="background:#f66;color:#fff;">Delete Task</button>
-      </form>
-    {% endif %}
-  </main>
+    <label>Energy Needed
+      <input type="range" name="energy" min="1" max="5"
+             value="{{ task.energy if editing else '1' }}">
+    </label>
+
+    <div class="actions">
+      <a href="{{ url_for('tasks_bp.task_list') }}" class="btn ghost">Cancel</a>
+      <button class="btn primary" type="submit">
+        {{ 'Update Task' if editing else 'Add Task' }}
+      </button>
+    </div>
+  </form>
+</main>
+
+<script src="{{ url_for('static', filename='addtask.js') }}"></script>
+
 </body>
 </html>
