@@ -11,5 +11,6 @@ def insights():
     return render_template(
         "insights.html",
         total_tasks=total,
-        completed_tasks=completed
+        completed_tasks=completed,
+        focus_time="1h 25m"   # placeholder
     )
