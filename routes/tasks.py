@@ -3,6 +3,7 @@ from bson import ObjectId
 
 tasks_bp = Blueprint("tasks_bp", __name__)
 
+
 def to_task_object(doc):
     """Convert Mongo document → template-friendly dict"""
     return {
@@ -13,14 +14,29 @@ def to_task_object(doc):
         "importance": doc.get("importance", "Low"),
         "complexity": doc.get("complexity", 1),
         "energy": doc.get("energy", 1),
-        "completed": doc.get("completed", False)
+        "completed": doc.get("completed", False),
     }
+
 
 @tasks_bp.route("/tasklist")
 def task_list():
-    raw = list(current_app.tasks.find())
-    tasks = [to_task_object(t) for t in raw]
-    return render_template("tasklist.html", tasks=tasks)
+    """Show all tasks, with optional sorting."""
+    sort_param = request.args.get("sort", "due_date")
+
+    # Map the sort query param -> MongoDB field name
+    sort_field_map = {
+        "due_date": "due_date",
+        "importance": "importance",
+        "complexity": "complexity",
+    }
+    sort_field = sort_field_map.get(sort_param, "due_date")
+
+    # 1 = ascending
+    cursor = current_app.tasks.find().sort(sort_field, 1)
+    tasks = [to_task_object(doc) for doc in cursor]
+
+    return render_template("tasklist.html", tasks=tasks, sort=sort_param)
+
 
 @tasks_bp.route("/addtask", methods=["GET", "POST"])
 def add_task():
@@ -32,12 +48,13 @@ def add_task():
             "importance": request.form["importance"],
             "complexity": int(request.form["complexity"]),
             "energy": int(request.form["energy"]),
-            "completed": False
+            "completed": False,
         }
         current_app.tasks.insert_one(new_task)
         return redirect(url_for("dashboard_bp.dashboard"))
 
     return render_template("addtask.html", editing=False)
+
 
 @tasks_bp.route("/tasks/<task_id>/edit", methods=["GET", "POST"])
 def edit_task(task_id):
@@ -54,15 +71,15 @@ def edit_task(task_id):
             "due_date": request.form["due_date"],
             "importance": request.form["importance"],
             "complexity": int(request.form["complexity"]),
-            "energy": int(request.form["energy"])
+            "energy": int(request.form["energy"]),
         }
         current_app.tasks.update_one(
-            {"_id": ObjectId(task_id)},
-            {"$set": updated_task}
+            {"_id": ObjectId(task_id)}, {"$set": updated_task}
         )
         return redirect(url_for("tasks_bp.task_list"))
 
     return render_template("addtask.html", task=task, editing=True)
+
 
 @tasks_bp.route("/tasks/<task_id>/delete", methods=["POST"])
 def delete_task(task_id):

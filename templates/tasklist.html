@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Task List — Task Management System</title>
-  <link rel="stylesheet" href="/static/tasklist.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='tasklist.css') }}" />
 </head>
 <body>
   <header>
@@ -14,13 +14,15 @@
 
   <main class="container">
     <div class="filters">
-      <label>Sort by:
-        <select>
-          <option>Due Date</option>
-          <option>Importance</option>
-          <option>Complexity</option>
-        </select>
-      </label>
+      <form method="get">
+        <label>Sort by:
+          <select name="sort" onchange="this.form.submit()">
+            <option value="due_date" {% if sort == 'due_date' %}selected{% endif %}>Due Date</option>
+            <option value="importance" {% if sort == 'importance' %}selected{% endif %}>Importance</option>
+            <option value="complexity" {% if sort == 'complexity' %}selected{% endif %}>Complexity</option>
+          </select>
+        </label>
+      </form>
     </div>
 
     <ul class="task-list">
@@ -29,6 +31,8 @@
         <div class="info">
           <h3>{{ t.title }}</h3>
           <p>Due: {{ t.due_date }}</p>
+          <p>Importance: {{ t.importance }}</p>
+          <p>Complexity: {{ t.complexity }}</p>
         </div>
         <div class="actions">
           <a href="{{ url_for('tasks_bp.edit_task', task_id=t.id) }}" class="edit">✏️</a>
