@@ -1,75 +1,143 @@
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* PAGE BACKGROUND + BASE TYPOGRAPHY */
 body {
   font-family: "Segoe UI", Tahoma, sans-serif;
   background: linear-gradient(120deg, #c4f5e8, #e0d6ff);
   color: #222;
   min-height: 100vh;
+}
+
+/* hide the raw checkbox for theme toggle */
+.theme-toggle {
+  display: none;
+}
+
+/* APP WRAPPER */
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10px;
+}
+
+.topbar .back {
+  text-decoration: none;
+  color: #4a5cff;
+  font-weight: 600;
+}
+
+.topbar .toggle {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 18px;
+}
+
+/* MAIN AREA */
+.wrap {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
-.container {
+/* CARD */
+.card.panel {
   background: #ffffff;
-  width: 90%;
+  width: 100%;
   max-width: 720px;
-  padding: 35px;
-  border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  padding: 35px 30px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
 }
 
-h1 {
-  text-align: center;
-  font-size: 26px;
-  color: #333;
-  margin-bottom: 8px;
+/* HEADINGS & TEXT */
+.card.panel h1 {
+  text-align: left;
+  font-size: 28px;
+  color: #222;
+  margin-bottom: 6px;
 }
 
-p {
-  text-align: center;
-  color: #555;
-  margin-bottom: 25px;
+.card.panel p.muted {
+  color: #666;
+  margin-bottom: 24px;
 }
 
+/* MOODS GRID */
 .moods {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .mood {
   background: #f2fdf9;
   border: 2px solid transparent;
-  border-radius: 6px;
-  padding: 15px;
+  border-radius: 8px;
+  padding: 14px 16px;
   text-align: center;
   font-weight: 600;
   color: #333;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mood span {
+  pointer-events: none; /* so clicking text still hits the label */
 }
 
 .mood:hover {
   background: #d9faf0;
-  transform: scale(1.02);
+  transform: translateY(-1px);
 }
 
 .mood input {
   display: none;
 }
 
+/* when the radio is checked */
 .mood input:checked + span {
   color: #5c45ff;
-  font-weight: bold;
+  font-weight: 700;
 }
 
+/* extra active styling from JS */
+.mood.active {
+  border-color: #5c45ff;
+  background: #e7e0ff;
+}
+
+/* SELECTED MOOD TEXT */
+#mood-selected {
+  font-size: 14px;
+  color: #555;
+}
+
+/* ACTIONS (SKIP / CONTINUE) */
 .actions {
+  margin-top: 24px;
   text-align: right;
 }
 
@@ -79,13 +147,15 @@ p {
   margin-left: 10px;
   border-radius: 20px;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
   transition: 0.2s;
 }
 
 .btn.primary {
   background: #5c45ff;
-  color: white;
+  color: #fff;
 }
 
 .btn.primary:hover {
@@ -95,9 +165,25 @@ p {
 .btn.ghost {
   border: 2px solid #5c45ff;
   color: #5c45ff;
+  background: transparent;
 }
 
 .btn.ghost:hover {
   background: #5c45ff;
-  color: white;
+  color: #fff;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .card.panel {
+    padding: 24px 18px;
+  }
+
+  .card.panel h1 {
+    font-size: 22px;
+  }
+
+  .moods {
+    grid-template-columns: 1fr 1fr;
+  }
 }
