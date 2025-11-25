@@ -25,7 +25,7 @@
     <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn secondary">Take a Break</a>
   </main>
 
-  <!-- Important: include the JS at the end so it runs after the DOM is loaded -->
+  <!-- JS MUST be loaded at the end -->
   <script src="{{ url_for('static', filename='timer.js') }}"></script>
 </body>
 </html>
