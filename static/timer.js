@@ -1,51 +1,30 @@
-// timer.js - simple focus timer (client-side only)
-;(function () {
-  let intervalId = null;
-  let remaining = 25 * 60; // default 25 minutes
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Focus Timer — Task Management System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='timer.css') }}" />
+</head>
+<body>
+  <header>
+    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
+    <h2>Focus Timer</h2>
+  </header>
 
-  function formatTime(sec) {
-    const m = Math.floor(sec / 60).toString().padStart(2, '0');
-    const s = (sec % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  }
+  <main class="timer-box">
+    <div class="display">
+      <h1 id="time">25:00</h1>
+      <p>Stay focused on your current task</p>
+    </div>
+    <div class="controls">
+      <button class="btn">Start</button>
+      <button class="btn ghost">Pause</button>
+      <button class="btn ghost">Reset</button>
+    </div>
+    <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn secondary">Take a Break</a>
+  </main>
 
-  function updateDisplay() {
-    const el = document.getElementById('time');
-    if (el) el.textContent = formatTime(remaining);
-  }
-
-  function start() {
-    if (intervalId) return;
-    intervalId = setInterval(() => {
-      if (remaining > 0) {
-        remaining -= 1;
-        updateDisplay();
-      } else {
-        clearInterval(intervalId);
-        intervalId = null;
-        // optional: play sound or notify
-      }
-    }, 1000);
-  }
-
-  function pause() {
-    if (intervalId) { clearInterval(intervalId); intervalId = null; }
-  }
-
-  function reset() {
-    pause();
-    remaining = 25 * 60;
-    updateDisplay();
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    updateDisplay();
-    const startBtn = document.querySelector('.controls .btn');
-    const pauseBtn = document.querySelector('.controls .btn.ghost');
-    const resetBtn = document.querySelector('.controls .btn.ghost:last-of-type');
-
-    if (startBtn) startBtn.addEventListener('click', start);
-    if (pauseBtn) pauseBtn.addEventListener('click', pause);
-    if (resetBtn) resetBtn.addEventListener('click', reset);
-  });
-})();
+  <script src="{{ url_for('static', filename='timer.js') }}"></script>
+</body>
+</html>
