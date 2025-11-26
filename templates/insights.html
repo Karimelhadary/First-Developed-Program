@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insights — Task Management System</title>
-  <link rel="stylesheet" href="/static/insights.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='insights.css') }}" />
 </head>
 <body>
   <header>
@@ -15,14 +15,23 @@
   <main class="container">
     <section class="summary">
       <h3>Today's Summary</h3>
-      <p>Tasks completed: <strong>{{ completed_tasks }}/{{ total_tasks }}</strong></p>
+      <p>Tasks completed: 
+        <strong>{{ completed_tasks }}/{{ total_tasks }}</strong>
+      </p>
       <p>Focus time: <strong>{{ focus_time }}</strong></p>
-      <p>Mood trend: 🎯 Focused → 😊 Calm</p>
+      <p>
+        Overall progress: 
+        {% if total_tasks > 0 %}
+          <strong>{{ (completed_tasks / total_tasks * 100)|round(0) }}%</strong>
+        {% else %}
+          <strong>0%</strong>
+        {% endif %}
+      </p>
     </section>
 
     <section class="chart">
-      <h3>Weekly Progress</h3>
-      <img src="https://via.placeholder.com/500x200?text=Chart+Mockup" alt="Progress Chart">
+      <h3>Progress Overview</h3>
+      <canvas id="progressChart" width="500" height="250"></canvas>
     </section>
 
     <section class="quote">
@@ -30,5 +39,44 @@
       <p>– Paul J. Meyer</p>
     </section>
   </main>
+
+  <!-- Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const totalTasks = {{ total_tasks|default(0) }};
+    const completedTasks = {{ completed_tasks|default(0) }};
+    const remainingTasks = {{ remaining_tasks|default(0) }};
+
+    const ctx = document.getElementById('progressChart').getContext('2d');
+
+    const data = {
+      labels: ['Completed', 'Remaining'],
+      datasets: [{
+        label: 'Tasks',
+        data: [completedTasks, remainingTasks],
+        // colors are auto-chosen by Chart.js if not specified, but we can be explicit:
+        backgroundColor: ['#4a5cff', '#e5e7ff'],
+        borderWidth: 1
+      }]
+    };
+
+    const options = {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        title: {
+          display: false
+        }
+      }
+    };
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: options
+    });
+  </script>
 </body>
 </html>

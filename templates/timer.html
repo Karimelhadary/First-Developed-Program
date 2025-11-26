@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Focus Timer — Task Management System</title>
-  <link rel="stylesheet" href="/static/timer.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='timer.css') }}" />
 </head>
 <body>
   <header>
@@ -18,11 +18,14 @@
       <p>Stay focused on your current task</p>
     </div>
     <div class="controls">
-      <button class="btn">Start</button>
-      <button class="btn ghost">Pause</button>
-      <button class="btn ghost">Reset</button>
+      <button id="startBtn" class="btn">Start</button>
+      <button id="pauseBtn" class="btn ghost">Pause</button>
+      <button id="resetBtn" class="btn ghost">Reset</button>
     </div>
     <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn secondary">Take a Break</a>
   </main>
+
+  <!-- JS MUST be loaded at the end -->
+  <script src="{{ url_for('static', filename='timer.js') }}"></script>
 </body>
 </html>

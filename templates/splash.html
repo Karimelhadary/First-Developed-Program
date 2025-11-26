@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Task Management System — Splash</title>
-  <link rel="stylesheet" href="/static/splash.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='splash.css') }}" />
 </head>
 <body>
   <input id="theme-toggle" type="checkbox" class="theme-toggle" aria-label="Toggle dark mode" />
@@ -27,5 +27,8 @@
 
     <footer class="foot">© 2025 Task Management System</footer>
   </div>
+
+  <!-- make theme toggle + global behaviors work -->
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>

@@ -4,10 +4,20 @@ from pymongo import MongoClient
 def create_app():
     app = Flask(__name__)
 
+    # Secret key (needed for session)
+    app.secret_key = "dev-secret-key-change-me"
+
+    # -----------------------
+    #  MongoDB connection
+    # -----------------------
     client = MongoClient("mongodb://localhost:27017/")
     app.db = client["task_manager_database"]
     app.tasks = app.db["tasks"]
+    app.users = app.db["users"]  # <-- NEW: users collection
 
+    # -----------------------
+    #  Register Blueprints
+    # -----------------------
     from routes.dashboard import dashboard_bp
     from routes.login import login_bp
     from routes.onboarding import onboarding_bp
@@ -25,3 +35,8 @@ def create_app():
     app.register_blueprint(timer_break_bp)
 
     return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True)
