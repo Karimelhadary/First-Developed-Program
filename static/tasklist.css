@@ -44,16 +44,52 @@ header {
   border: 1px solid #ddd;
   padding: 12px;
   border-radius: 6px;
+  background: #fafbff;
 }
 
 .task-list li:hover {
   background: #f5f5ff;
 }
 
+.task-list li.completed .info h3 {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.info p {
+  margin: 2px 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .actions a {
-  margin-left: 8px;
   text-decoration: none;
   font-size: 18px;
+}
+
+.actions form {
+  display: inline-block;
+}
+
+button.complete,
+button.delete {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+}
+
+button.complete {
+  color: #198754; /* green-ish */
+}
+
+button.delete {
+  color: #d63333;
 }
 
 .btn.primary {
@@ -65,4 +101,9 @@ header {
   margin-top: 15px;
   text-decoration: none;
   font-weight: bold;
+}
+
+/* optional: make completed tasks slightly dimmer overall */
+.task-list li.completed {
+  background: #eef2ff;
 }
