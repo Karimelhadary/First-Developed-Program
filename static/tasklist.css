@@ -106,4 +106,8 @@ button.delete {
 /* optional: make completed tasks slightly dimmer overall */
 .task-list li.completed {
   background: #eef2ff;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 3cce481f8c36323c74c88d12f9c2e0c9155d9380

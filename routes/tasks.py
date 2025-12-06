@@ -106,4 +106,8 @@ def toggle_complete(task_id):
     sort_param = request.args.get("sort")
     if sort_param:
         return redirect(url_for("tasks_bp.task_list", sort=sort_param))
+<<<<<<< HEAD
     return redirect(url_for("tasks_bp.task_list"))
+=======
+    return redirect(url_for("tasks_bp.task_list"))
+>>>>>>> 3cce481f8c36323c74c88d12f9c2e0c9155d9380
