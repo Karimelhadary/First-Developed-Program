@@ -27,7 +27,7 @@
 
     <ul class="task-list">
       {% for t in tasks %}
-      <li>
+      <li class="{% if t.completed %}completed{% endif %}">
         <div class="info">
           <h3>{{ t.title }}</h3>
           <p>Due: {{ t.due_date }}</p>
@@ -35,9 +35,20 @@
           <p>Complexity: {{ t.complexity }}</p>
         </div>
         <div class="actions">
+          <form action="{{ url_for('tasks_bp.toggle_complete', task_id=t.id, sort=sort) }}" method="post" style="display:inline">
+            <button class="complete" type="submit">
+              {% if t.completed %}
+                ↩️ Mark as not done
+              {% else %}
+                ✅ Mark done
+              {% endif %}
+            </button>
+          </form>
+
           <a href="{{ url_for('tasks_bp.edit_task', task_id=t.id) }}" class="edit">✏️</a>
+
           <form action="{{ url_for('tasks_bp.delete_task', task_id=t.id) }}" method="post" style="display:inline">
-            <button class="delete" aria-label="Delete">🗑️</button>
+            <button class="delete" type="submit" aria-label="Delete">🗑️</button>
           </form>
         </div>
       </li>

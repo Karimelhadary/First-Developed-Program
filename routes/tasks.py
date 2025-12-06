@@ -74,7 +74,8 @@ def edit_task(task_id):
             "energy": int(request.form["energy"]),
         }
         current_app.tasks.update_one(
-            {"_id": ObjectId(task_id)}, {"$set": updated_task}
+            {"_id": ObjectId(task_id)},
+            {"$set": updated_task},
         )
         return redirect(url_for("tasks_bp.task_list"))
 
@@ -84,4 +85,25 @@ def edit_task(task_id):
 @tasks_bp.route("/tasks/<task_id>/delete", methods=["POST"])
 def delete_task(task_id):
     current_app.tasks.delete_one({"_id": ObjectId(task_id)})
+    return redirect(url_for("tasks_bp.task_list"))
+
+
+@tasks_bp.route("/tasks/<task_id>/toggle_complete", methods=["POST"])
+def toggle_complete(task_id):
+    """Toggle the 'completed' status of a task."""
+    doc = current_app.tasks.find_one({"_id": ObjectId(task_id)})
+    if not doc:
+        abort(404)
+
+    new_value = not doc.get("completed", False)
+
+    current_app.tasks.update_one(
+        {"_id": ObjectId(task_id)},
+        {"$set": {"completed": new_value}},
+    )
+
+    # preserve current sort choice if present
+    sort_param = request.args.get("sort")
+    if sort_param:
+        return redirect(url_for("tasks_bp.task_list", sort=sort_param))
     return redirect(url_for("tasks_bp.task_list"))
