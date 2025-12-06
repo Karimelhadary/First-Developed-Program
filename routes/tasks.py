@@ -5,7 +5,7 @@ tasks_bp = Blueprint("tasks_bp", __name__)
 
 
 def to_task_object(doc):
-    """Convert Mongo document → template-friendly dict"""
+    """Convert Mongo document → template friendly dict"""
     return {
         "id": str(doc["_id"]),
         "title": doc.get("title", ""),
@@ -20,10 +20,8 @@ def to_task_object(doc):
 
 @tasks_bp.route("/tasklist")
 def task_list():
-    """Show all tasks, with optional sorting."""
     sort_param = request.args.get("sort", "due_date")
 
-    # Map the sort query param -> MongoDB field name
     sort_field_map = {
         "due_date": "due_date",
         "importance": "importance",
@@ -31,7 +29,6 @@ def task_list():
     }
     sort_field = sort_field_map.get(sort_param, "due_date")
 
-    # 1 = ascending
     cursor = current_app.tasks.find().sort(sort_field, 1)
     tasks = [to_task_object(doc) for doc in cursor]
 
@@ -70,7 +67,7 @@ def edit_task(task_id):
             "description": request.form["description"],
             "due_date": request.form["due_date"],
             "importance": request.form["importance"],
-            "complexity": int(request.form["complexity"]),
+            "complexplexity": int(request.form["complexity"]),
             "energy": int(request.form["energy"]),
         }
         current_app.tasks.update_one(
@@ -90,7 +87,6 @@ def delete_task(task_id):
 
 @tasks_bp.route("/tasks/<task_id>/toggle_complete", methods=["POST"])
 def toggle_complete(task_id):
-    """Toggle the 'completed' status of a task."""
     doc = current_app.tasks.find_one({"_id": ObjectId(task_id)})
     if not doc:
         abort(404)
@@ -102,12 +98,8 @@ def toggle_complete(task_id):
         {"$set": {"completed": new_value}},
     )
 
-    # preserve current sort choice if present
     sort_param = request.args.get("sort")
     if sort_param:
         return redirect(url_for("tasks_bp.task_list", sort=sort_param))
-<<<<<<< HEAD
+
     return redirect(url_for("tasks_bp.task_list"))
-=======
-    return redirect(url_for("tasks_bp.task_list"))
->>>>>>> 3cce481f8c36323c74c88d12f9c2e0c9155d9380
