@@ -17,15 +17,27 @@
       <h1 id="time">25:00</h1>
       <p>Stay focused on your current task</p>
     </div>
+
     <div class="controls">
-      <button id="startBtn" class="btn">Start</button>
-      <button id="pauseBtn" class="btn ghost">Pause</button>
-      <button id="resetBtn" class="btn ghost">Reset</button>
+      <button class="btn" id="start-btn">Start</button>
+      <button class="btn ghost" id="pause-btn">Pause</button>
+      <button class="btn ghost" id="reset-btn">Reset</button>
     </div>
-    <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn secondary">Take a Break</a>
+
+    <!-- NEW: log focus session into MongoDB -->
+    <form method="post" class="log-session" style="margin-top:20px;">
+      <label>
+        Log session (minutes):
+        <input type="number" name="minutes" min="5" max="180" value="25" />
+      </label>
+      <button class="btn" type="submit" style="margin-left:10px;">Save Session</button>
+    </form>
+
+    <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn secondary" style="margin-top:20px;">
+      Take a Break
+    </a>
   </main>
 
-  <!-- JS MUST be loaded at the end -->
   <script src="{{ url_for('static', filename='timer.js') }}"></script>
 </body>
 </html>

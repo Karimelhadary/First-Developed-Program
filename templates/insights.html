@@ -15,18 +15,20 @@
   <main class="container">
     <section class="summary">
       <h3>Today's Summary</h3>
-      <p>Tasks completed: 
+      <p>Tasks completed:
         <strong>{{ completed_tasks }}/{{ total_tasks }}</strong>
       </p>
       <p>Focus time: <strong>{{ focus_time }}</strong></p>
       <p>
-        Overall progress: 
+        Overall progress:
         {% if total_tasks > 0 %}
           <strong>{{ (completed_tasks / total_tasks * 100)|round(0) }}%</strong>
         {% else %}
           <strong>0%</strong>
         {% endif %}
       </p>
+      <p>Focus sessions logged: <strong>{{ focus_sessions }}</strong></p>
+      <p>Moods logged: <strong>{{ mood_logs }}</strong></p>
     </section>
 
     <section class="chart">
@@ -54,7 +56,6 @@
       datasets: [{
         label: 'Tasks',
         data: [completedTasks, remainingTasks],
-        // colors are auto-chosen by Chart.js if not specified, but we can be explicit:
         backgroundColor: ['#4a5cff', '#e5e7ff'],
         borderWidth: 1
       }]

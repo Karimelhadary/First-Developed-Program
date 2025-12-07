@@ -4,7 +4,7 @@ from pymongo import MongoClient
 def create_app():
     app = Flask(__name__)
 
-    # Secret key (needed for session)
+    # Secret key - needed for sessions
     app.secret_key = "dev-secret-key-change-me"
 
     # -----------------------
@@ -12,8 +12,12 @@ def create_app():
     # -----------------------
     client = MongoClient("mongodb://localhost:27017/")
     app.db = client["task_manager_database"]
+
+    # Collections
+    app.users = app.db["users"]
     app.tasks = app.db["tasks"]
-    app.users = app.db["users"]  # <-- NEW: users collection
+    app.moods = app.db["moods"]              # NEW: mood logs from onboarding
+    app.focus_sessions = app.db["focus_sessions"]  # NEW: logged focus timer sessions
 
     # -----------------------
     #  Register Blueprints
