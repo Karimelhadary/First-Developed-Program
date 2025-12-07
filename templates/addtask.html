@@ -4,60 +4,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ 'Edit Task' if editing else 'Add Task' }} — Task Management System</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="{{ url_for('static', filename='addtask.css') }}">
 </head>
 <body>
 
-<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('splash_bp.splash') }}">TaskManager</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard_bp.dashboard') }}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('tasks_bp.task_list') }}">Tasks</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="container mb-3">
   <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
   <h2>{{ 'Edit Task' if editing else 'Add New Task' }}</h2>
 </header>
 
 <main class="container">
-  <form class="task-form" method="POST">
+  <div class="card p-3 shadow-sm">
+    <form class="task-form" method="POST">
+      <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-control" name="title" required
+               value="{{ task.title if editing else '' }}">
+      </div>
 
-    <label>Title
-      <input type="text" name="title" required 
-             value="{{ task.title if editing else '' }}">
-    </label>
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" name="description">{{ task.description if editing else '' }}</textarea>
+      </div>
 
-    <label>Description
-      <textarea name="description">{{ task.description if editing else '' }}</textarea>
-    </label>
+      <div class="mb-3">
+        <label class="form-label">Due Date</label>
+        <input type="date" class="form-control" name="due_date" required
+               value="{{ task.due_date if editing else '' }}">
+      </div>
 
-    <label>Due Date
-      <input type="date" name="due_date" required
-             value="{{ task.due_date if editing else '' }}">
-    </label>
+      <div class="mb-3">
+        <label class="form-label">Importance</label>
+        <select class="form-select" name="importance">
+          <option {{ 'selected' if editing and task.importance=='Low' }}>Low</option>
+          <option {{ 'selected' if editing and task.importance=='Medium' }}>Medium</option>
+          <option {{ 'selected' if editing and task.importance=='High' }}>High</option>
+        </select>
+      </div>
 
-    <label>Importance
-      <select name="importance">
-        <option {{ 'selected' if editing and task.importance=='Low' }}>Low</option>
-        <option {{ 'selected' if editing and task.importance=='Medium' }}>Medium</option>
-        <option {{ 'selected' if editing and task.importance=='High' }}>High</option>
-      </select>
-    </label>
+      <div class="mb-3">
+        <label class="form-label">Complexity</label>
+        <input type="range" class="form-range" name="complexity" min="1" max="5"
+               value="{{ task.complexity if editing else '1' }}">
+      </div>
 
-    <label>Complexity
-      <input type="range" name="complexity" min="1" max="5"
-             value="{{ task.complexity if editing else '1' }}">
-    </label>
+      <div class="mb-3">
+        <label class="form-label">Energy Needed</label>
+        <input type="range" class="form-range" name="energy" min="1" max="5"
+               value="{{ task.energy if editing else '1' }}">
+      </div>
 
-    <label>Energy Needed
-      <input type="range" name="energy" min="1" max="5"
-             value="{{ task.energy if editing else '1' }}">
-    </label>
+      <div class="d-flex justify-content-between">
+        <a href="{{ url_for('tasks_bp.task_list') }}" class="btn btn-outline-secondary">Cancel</a>
+        <button class="btn btn-primary" type="submit">
+          {{ 'Update Task' if editing else 'Add Task' }}
+        </button>
+      </div>
+    </form>
 
-    <div class="actions">
-      <a href="{{ url_for('tasks_bp.task_list') }}" class="btn ghost">Cancel</a>
-      <button class="btn primary" type="submit">
-        {{ 'Update Task' if editing else 'Add Task' }}
-      </button>
-    </div>
-  </form>
+    {% if editing %}
+    <form action="{{ url_for('tasks_bp.delete_task', task_id=task.id) }}" method="post" class="mt-3">
+      <button type="submit" class="btn btn-danger"
+              onclick="return confirm('Delete this task?');">Delete Task</button>
+    </form>
+    {% endif %}
+  </div>
 </main>
 
-<script src="{{ url_for('static', filename='addtask.js') }}"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
