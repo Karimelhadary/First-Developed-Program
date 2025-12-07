@@ -4,85 +4,67 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard — Task Manager</title>
-
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-
   <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
 <body>
 
 <input id="theme-toggle" type="checkbox" class="theme-toggle" />
 
-<!-- main navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ url_for('splash_bp.splash') }}">TaskManager</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#mainNavbar" aria-controls="mainNavbar"
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mainNavbar">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard_bp.dashboard') }}">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('tasks_bp.task_list') }}">Tasks</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('insights_bp.insights') }}">Insights</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('timer_break_bp.timer') }}">Timer</a></li>
-      </ul>
-      <span class="navbar-text me-3">
-        {{ session.get('user_email', 'Guest') }}
-      </span>
-      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('login_bp.logout') }}">Logout</a>
-    </div>
+<div class="app">
+
+<header class="top">
+  <div class="greeting">
+    <h1>Hello!</h1>
+    <p class="muted">
+      Here are your tasks today.
+      <br>
+      Current mood: <strong>{{ mood_label }}</strong>
+    </p>
   </div>
-</nav>
+  <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
+</header>
 
-<div class="app container">
+<main class="content">
 
-  <header class="top mb-3">
-    <div class="greeting">
-      <h1>Hello!</h1>
-      <p class="muted">Here are your tasks today.</p>
-    </div>
-    <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
-  </header>
+<section class="tasks card">
+  <h3>Your Tasks</h3>
 
-  <main class="content row">
-    <section class="tasks card col-12 col-lg-8 mb-3 p-3 shadow-sm">
-      <h3>Your Tasks</h3>
-      <ul class="task-list">
-        {% for t in tasks %}
-        <li class="task d-flex align-items-center justify-content-between">
-          <span class="box"></span>
-          <div class="meta">
-            <div class="title">{{ t.title }}</div>
-            <div class="sub">{{ t.description }}</div>
-            <div class="sub">Due: {{ t.due_date }}</div>
-          </div>
-          <span class="pill">{{ t.importance }}</span>
-        </li>
-        {% else %}
-        <li class="task">
-          <div class="meta">No tasks yet.</div>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
+  <ul class="task-list">
 
-    <div class="actions col-12 col-lg-4 d-flex flex-column gap-2">
-      <a class="btn btn-primary" href="{{ url_for('tasks_bp.add_task') }}">+ Add Task</a>
-      <a class="btn btn-outline-primary" href="{{ url_for('timer_break_bp.timer') }}">⏱️ Start Focus Timer</a>
-      <a class="btn btn-outline-primary" href="{{ url_for('insights_bp.insights') }}">📈 Insights</a>
-      <a class="btn btn-outline-primary" href="{{ url_for('tasks_bp.task_list') }}">📋 All Tasks</a>
-    </div>
-  </main>
+    {% for t in tasks %}
+    <li class="task{% if t.completed %} completed{% endif %}">
+
+      <span class="box"></span>
+
+      <div class="meta">
+        <div class="title">{{ t.title }}</div>
+        <div class="sub">{{ t.description }}</div>
+        <div class="sub">Due: {{ t.due_date }}</div>
+      </div>
+
+      <span class="pill">{{ t.importance }}</span>
+
+    </li>
+    {% else %}
+    <li class="task">
+      <div class="meta">No tasks yet.</div>
+    </li>
+    {% endfor %}
+
+  </ul>
+</section>
+
+<div class="actions">
+  <a class="btn add" href="{{ url_for('tasks_bp.add_task') }}">+ Add Task</a>
+  <a class="btn hollow" href="{{ url_for('timer_break_bp.timer') }}">⏱️ Start Focus Timer</a>
+  <a class="btn hollow" href="{{ url_for('insights_bp.insights') }}">📈 Insights</a>
+  <a class="btn hollow" href="{{ url_for('tasks_bp.task_list') }}">📋 All Tasks</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</main>
+</div>
+
 <script src="{{ url_for('static', filename='main.js') }}"></script>
+
 </body>
 </html>
