@@ -4,16 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Task Management System — Onboarding</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
   <link rel="stylesheet" href="{{ url_for('static', filename='onboarding.css') }}" />
 </head>
 <body>
   <input id="theme-toggle" type="checkbox" class="theme-toggle" />
-  <div class="app">
-    <header class="topbar">
-      <a class="back" href="{{ url_for('login_bp.login') }}">← Back</a>
-      <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
-    </header>
 
+  <!-- navbar shared with other pages -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('splash_bp.splash') }}">TaskManager</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#mainNavbar" aria-controls="mainNavbar"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('dashboard_bp.dashboard') }}">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('tasks_bp.task_list') }}">Tasks</a>
+          </li>
+        </ul>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('login_bp.logout') }}">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app">
     <main class="wrap">
       <section class="card panel">
         <h1>How are you feeling today?</h1>
@@ -44,14 +70,14 @@
           </p>
 
           <div class="actions">
-            <!-- Skip removed, only Continue button -->
-            <button class="btn primary" type="submit">Continue</button>
+            <button class="btn btn-primary" type="submit">Continue</button>
           </div>
         </form>
       </section>
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{{ url_for('static', filename='main.js') }}"></script>
   <script src="{{ url_for('static', filename='onboarding.js') }}"></script>
 </body>
