@@ -26,12 +26,31 @@ def find_user_by_email(email: str):
 
 
 def verify_user(email: str, password: str) -> bool:
+    """
+    Verify user credentials.
+
+    Supports:
+    - NEW users: with `salt` + `password_hash` (hashed & peppered)
+    - OLD users (before security update): with plain `password` field
+      (so the app doesn't crash with KeyError)
+    """
     user = find_user_by_email(email)
     if not user:
         return False
 
-    return verify_password(
-        password,
-        salt_hex=user["salt"],
-        stored_hash=user["password_hash"],
-    )
+    # --- New style: hashed password with salt+pepper ---
+    if "salt" in user and "password_hash" in user:
+        return verify_password(
+            password,
+            salt_hex=user["salt"],
+            stored_hash=user["password_hash"],
+        )
+
+    # --- Legacy style: plain-text password (old accounts) ---
+    # This is just here so your project doesn't crash on old data.
+    # New accounts created via /register will NOT use this anymore.
+    if "password" in user:
+        return user["password"] == password
+
+    # If neither format is present, fail safely
+    return False
