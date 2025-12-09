@@ -4,7 +4,7 @@ from pymongo import MongoClient
 def create_app():
     app = Flask(__name__)
 
-    # Secret key - needed for sessions
+    # Secret key - required for sessions
     app.secret_key = "dev-secret-key-change-me"
 
     # -----------------------
@@ -16,14 +16,19 @@ def create_app():
     # Collections
     app.users = app.db["users"]
     app.tasks = app.db["tasks"]
-    app.moods = app.db["moods"]              # NEW: mood logs from onboarding
-    app.focus_sessions = app.db["focus_sessions"]  # NEW: logged focus timer sessions
+    app.moods = app.db["moods"]               # Stores onboarding mood logs
+    app.focus_sessions = app.db["focus_sessions"]  # Stores timer sessions
+
+    # -----------------------
+    #  Security Pepper
+    # -----------------------
+    app.config["PEPPER"] = "MY_SUPER_SECRET_KEY_123"
 
     # -----------------------
     #  Register Blueprints
     # -----------------------
     from routes.dashboard import dashboard_bp
-    from routes.login import login_bp
+    from routes.login import login_bp          # login + register + logout
     from routes.onboarding import onboarding_bp
     from routes.splash import splash_bp
     from routes.tasks import tasks_bp

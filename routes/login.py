@@ -4,10 +4,10 @@ from flask import (
     redirect,
     request,
     url_for,
-    current_app,
     session,
 )
-from werkzeug.security import generate_password_hash, check_password_hash
+
+from model.user_model import verify_user, create_user, find_user_by_email
 
 login_bp = Blueprint("login_bp", __name__)
 
@@ -16,35 +16,28 @@ login_bp = Blueprint("login_bp", __name__)
 @login_bp.route("/login", methods=["GET", "POST"])
 def login():
     error = None
+    email_value = ""
 
     if request.method == "POST":
-        email = request.form.get("email", "").lower().strip()
-        password = request.form.get("password", "")
+        email = request.form["email"].lower().strip()
+        password = request.form["password"]
+        email_value = email
 
-        if not email or not password:
-            error = "Please fill in both email and password."
+        if verify_user(email, password):
+            session["user"] = email
+            return redirect(url_for("onboarding_bp.onboarding"))
         else:
-            users = current_app.users
-            user = users.find_one({"email": email})
+            error = "Invalid credentials"
 
-            if not user or not check_password_hash(user.get("password", ""), password):
-                error = "Invalid email or password."
-            else:
-                # login success -> store basic user info in session
-                session["user_id"] = str(user["_id"])
-                session["user_email"] = user["email"]
-                # go to onboarding or dashboard
-                return redirect(url_for("onboarding_bp.onboarding"))
-
-    return render_template("login.html", error=error)
+    return render_template("login.html", error=error, email=email_value)
 
 
 # ---------- REGISTER ----------
 @login_bp.route("/register", methods=["GET", "POST"])
 def register():
     error = None
-    name = ""
-    email = ""
+    name_value = ""
+    email_value = ""
 
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -52,30 +45,27 @@ def register():
         password = request.form.get("password", "")
         confirm = request.form.get("confirm", "")
 
+        name_value = name
+        email_value = email
+
+        # Input validation
         if not email or not password:
             error = "Email and password are required."
         elif password != confirm:
             error = "Passwords do not match."
+        elif find_user_by_email(email):
+            error = "An account with that email already exists."
         else:
-            users = current_app.users
-            existing = users.find_one({"email": email})
-            if existing:
-                error = "An account with that email already exists."
-            else:
-                hashed = generate_password_hash(password)
-                result = users.insert_one(
-                    {
-                        "name": name,
-                        "email": email,
-                        "password": hashed,
-                    }
-                )
-                # auto-login after registration
-                session["user_id"] = str(result.inserted_id)
-                session["user_email"] = email
-                return redirect(url_for("onboarding_bp.onboarding"))
+            create_user(email, password)
+            session["user"] = email
+            return redirect(url_for("onboarding_bp.onboarding"))
 
-    return render_template("register.html", error=error, name=name, email=email)
+    return render_template(
+        "register.html",
+        error=error,
+        name=name_value,
+        email=email_value,
+    )
 
 
 # ---------- LOGOUT ----------
