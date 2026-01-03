@@ -24,8 +24,11 @@ def login():
         email_value = email
 
         if verify_user(email, password):
-            session["user"] = email
-            return redirect(url_for("onboarding_bp.onboarding"))
+            user = find_user_by_email(email)
+            session["user_id"] = str(user["_id"])
+            session["user_email"] = user["email"]
+            session["user_name"] = user.get("name", "User")
+            return redirect(request.args.get("next") or url_for("onboarding_bp.onboarding"))
         else:
             error = "Invalid credentials"
 
@@ -56,8 +59,10 @@ def register():
         elif find_user_by_email(email):
             error = "An account with that email already exists."
         else:
-            create_user(email, password)
-            session["user"] = email
+            user_id = create_user(name, email, password)
+            session["user_id"] = user_id
+            session["user_email"] = email
+            session["user_name"] = name or "User"
             return redirect(url_for("onboarding_bp.onboarding"))
 
     return render_template(
