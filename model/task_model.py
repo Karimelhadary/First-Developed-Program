@@ -1,5 +1,6 @@
 from flask import current_app
 from bson import ObjectId
+from datetime import datetime
 
 
 # ---------- helpers ----------
@@ -8,6 +9,9 @@ def _mongo_to_task(doc):
     """Convert a MongoDB document to a simple dict usable in templates."""
     return {
         "id": str(doc["_id"]),
+        "user_id": doc.get("user_id"),
+        "project_id": doc.get("project_id"),
+        "tags": doc.get("tags", []),
         "title": doc.get("title", ""),
         "description": doc.get("description", ""),
         "due_date": doc.get("due_date", ""),
@@ -23,13 +27,13 @@ importance_rank = {"Low": 1, "Medium": 2, "High": 3}
 
 # ---------- list / sorting ----------
 
-def get_all_tasks_sorted(sort_param: str):
+def get_all_tasks_sorted(user_id: str, sort_param: str):
     """
     Return all tasks as a list of dicts, sorted according to sort_param.
 
     sort_param in {"due_date", "importance", "complexity"}.
     """
-    docs = list(current_app.tasks.find())
+    docs = list(current_app.tasks.find({"user_id": user_id}))
 
     if sort_param == "importance":
         # High -> Medium -> Low
@@ -47,7 +51,7 @@ def get_all_tasks_sorted(sort_param: str):
     return [_mongo_to_task(d) for d in docs]
 
 
-def get_tasks_for_dashboard(mood: str):
+def get_tasks_for_dashboard(user_id: str, mood: str):
     """
     Return tasks sorted based on the user's mood.
 
@@ -57,7 +61,7 @@ def get_tasks_for_dashboard(mood: str):
     creative  -> lowest "energy" first
     default   -> by due date
     """
-    docs = list(current_app.tasks.find())
+    docs = list(current_app.tasks.find({"user_id": user_id}))
 
     if mood == "energetic":
         docs.sort(key=lambda d: d.get("complexity", 1), reverse=True)
@@ -81,42 +85,51 @@ def get_tasks_for_dashboard(mood: str):
 
 # ---------- single-task operations ----------
 
-def get_task_by_id(task_id: str):
-    doc = current_app.tasks.find_one({"_id": ObjectId(task_id)})
+def get_task_by_id(user_id: str, task_id: str):
+    doc = current_app.tasks.find_one({"_id": ObjectId(task_id), "user_id": user_id})
     if not doc:
         return None
     return _mongo_to_task(doc)
 
 
-def insert_task(task_data: dict):
+def insert_task(user_id: str, task_data: dict):
     """Insert a new task. task_data is a plain dict with fields."""
+    task_data = {**task_data, "user_id": user_id}
     result = current_app.tasks.insert_one(task_data)
+    current_app.audit_logs.insert_one(
+        {
+            "user_id": user_id,
+            "action": "CREATE_TASK",
+            "created_at": datetime.utcnow(),
+            "payload": {"task_id": str(result.inserted_id)},
+        }
+    )
     return str(result.inserted_id)
 
 
-def update_task(task_id: str, updates: dict) -> bool:
+def update_task(user_id: str, task_id: str, updates: dict) -> bool:
     result = current_app.tasks.update_one(
-        {"_id": ObjectId(task_id)},
+        {"_id": ObjectId(task_id), "user_id": user_id},
         {"$set": updates},
     )
     return result.modified_count > 0
 
 
-def delete_task(task_id: str) -> bool:
-    result = current_app.tasks.delete_one({"_id": ObjectId(task_id)})
+def delete_task(user_id: str, task_id: str) -> bool:
+    result = current_app.tasks.delete_one({"_id": ObjectId(task_id), "user_id": user_id})
     return result.deleted_count > 0
 
 
-def toggle_task_complete(task_id: str) -> bool:
+def toggle_task_complete(user_id: str, task_id: str) -> bool:
     """Flip completed True/False and return the new value."""
-    doc = current_app.tasks.find_one({"_id": ObjectId(task_id)})
+    doc = current_app.tasks.find_one({"_id": ObjectId(task_id), "user_id": user_id})
     if not doc:
         return False
 
     new_value = not doc.get("completed", False)
 
     current_app.tasks.update_one(
-        {"_id": ObjectId(task_id)},
+        {"_id": ObjectId(task_id), "user_id": user_id},
         {"$set": {"completed": new_value}},
     )
     return new_value
