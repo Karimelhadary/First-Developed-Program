@@ -35,7 +35,27 @@
 <main class="timer-box card p-4 shadow-sm container">
   <div class="display mb-3 text-center">
     <h1 id="time">25:00</h1>
-    <p>Stay focused on your current task</p>
+    <p class="mb-0">Stay focused on your current task</p>
+    <small class="text-muted" id="session-label">Focus session</small>
+  </div>
+
+  <div class="row g-2 align-items-end mb-3">
+    <div class="col-12 col-md-4">
+      <label class="form-label">Mode</label>
+      <select class="form-select" id="mode-select">
+        <option value="focus" selected>Focus</option>
+        <option value="short_break">Short break</option>
+        <option value="long_break">Long break</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-4">
+      <label class="form-label">Minutes</label>
+      <input type="number" class="form-control" id="minutes-input" min="1" max="180" value="25" />
+    </div>
+    <div class="col-12 col-md-4">
+      <label class="form-label">(Optional) Task ID</label>
+      <input type="text" class="form-control" id="task-id-input" placeholder="Paste task id" />
+    </div>
   </div>
 
   <div class="controls d-flex justify-content-center gap-2 mb-3">
@@ -44,19 +64,29 @@
     <button class="btn btn-outline-secondary" id="reset-btn">Reset</button>
   </div>
 
-  <!-- Log focus session -->
-  <form method="post" class="log-session d-flex align-items-center justify-content-center gap-2 mb-3">
-    <label class="form-label mb-0">
-      Log session (minutes):
-      <input type="number" class="form-control d-inline-block w-auto" name="minutes" min="5" max="180" value="25" />
-    </label>
-    <button class="btn btn-success" type="submit">Save Session</button>
-  </form>
-
-  <a href="{{ url_for('timer_break_bp.break_page') }}" class="btn btn-secondary d-block mx-auto">
-    Take a Break
-  </a>
+  <div class="alert alert-info mb-0" id="session-tip" role="alert">
+    When the countdown finishes, your session is saved automatically and you'll be prompted to take a break.
+  </div>
 </main>
+
+<!-- Session complete modal -->
+<div class="modal fade" id="doneModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Session complete 🎉</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Great job. Want to take a break now?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Not now</button>
+        <a class="btn btn-primary" href="{{ url_for('timer_break_bp.break_page') }}">Start break</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='timer.js') }}"></script>

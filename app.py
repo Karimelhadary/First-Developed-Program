@@ -13,11 +13,23 @@ def create_app():
     client = MongoClient("mongodb://localhost:27017/")
     app.db = client["task_manager_database"]
 
-    # Collections
+    # Collections (MongoDB will create them automatically on first insert)
+    # Core
     app.users = app.db["users"]
     app.tasks = app.db["tasks"]
-    app.moods = app.db["moods"]               # Stores onboarding mood logs
-    app.focus_sessions = app.db["focus_sessions"]  # Stores timer sessions
+
+    # Mood onboarding logs
+    app.moods = app.db["moods"]
+
+    # Pomodoro / break sessions
+    app.focus_sessions = app.db["focus_sessions"]
+    app.break_sessions = app.db["break_sessions"]
+
+    # Extra collections to meet the "4 per person" requirement + add real purpose
+    app.projects = app.db["projects"]         # group tasks into projects
+    app.tags = app.db["tags"]                 # reusable labels
+    app.settings = app.db["settings"]         # per-user defaults (focus/break length)
+    app.audit_logs = app.db["audit_logs"]     # store important actions (CRUD trace)
 
     # -----------------------
     #  Security Pepper
@@ -34,6 +46,8 @@ def create_app():
     from routes.tasks import tasks_bp
     from routes.insights import insights_bp
     from routes.timer_break import timer_break_bp
+    from routes.projects import projects_bp
+    from routes.settings import settings_bp
 
     app.register_blueprint(splash_bp)
     app.register_blueprint(login_bp)
@@ -42,6 +56,8 @@ def create_app():
     app.register_blueprint(tasks_bp)
     app.register_blueprint(insights_bp)
     app.register_blueprint(timer_break_bp)
+    app.register_blueprint(projects_bp)
+    app.register_blueprint(settings_bp)
 
     return app
 

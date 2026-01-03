@@ -32,27 +32,23 @@
 </header>
 
 <main class="container">
-  <section class="summary card p-3 mb-3 shadow-sm">
-    <h3>Today's Summary</h3>
-    <p>Tasks completed:
-      <strong>{{ completed_tasks }}/{{ total_tasks }}</strong>
-    </p>
-    <p>Focus time: <strong>{{ focus_time }}</strong></p>
-    <p>
-      Overall progress:
-      {% if total_tasks > 0 %}
-        <strong>{{ (completed_tasks / total_tasks * 100)|round(0) }}%</strong>
-      {% else %}
-        <strong>0%</strong>
-      {% endif %}
-    </p>
-    <p>Focus sessions logged: <strong>{{ focus_sessions }}</strong></p>
-    <p>Moods logged: <strong>{{ mood_logs }}</strong></p>
+  <section class="summary card p-3 mb-3 shadow-sm" id="summary">
+    <h3>This Week's Summary</h3>
+    <p>Tasks completed: <strong id="tasks-completed">–</strong></p>
+    <p>Overall progress: <strong id="tasks-progress">–</strong></p>
+    <p>Focus time: <strong id="focus-time">–</strong> (<span id="focus-sessions">–</span> sessions)</p>
+    <p>Break time: <strong id="break-time">–</strong> (<span id="break-sessions">–</span> sessions)</p>
+    <p>Mood logs: <strong id="mood-logs">–</strong></p>
   </section>
 
   <section class="chart card p-3 mb-3 shadow-sm">
-    <h3>Progress Overview</h3>
-    <canvas id="progressChart" width="500" height="250"></canvas>
+    <h3>Tasks Overview</h3>
+    <canvas id="tasksChart" width="500" height="250"></canvas>
+  </section>
+
+  <section class="chart card p-3 mb-3 shadow-sm">
+    <h3>Focus vs Break Minutes (Last 7 days)</h3>
+    <canvas id="minutesChart" width="500" height="250"></canvas>
   </section>
 
   <section class="quote card p-3 shadow-sm">
@@ -64,35 +60,47 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const totalTasks = {{ total_tasks|default(0) }};
-  const completedTasks = {{ completed_tasks|default(0) }};
-  const remainingTasks = {{ remaining_tasks|default(0) }};
+  async function loadInsights() {
+    const res = await fetch('/api/insights', { credentials: 'same-origin' });
+    const data = await res.json();
 
-  const ctx = document.getElementById('progressChart').getContext('2d');
+    // Summary numbers
+    document.getElementById('tasks-completed').textContent = `${data.tasks.completed}/${data.tasks.total}`;
+    const pct = data.tasks.total > 0 ? Math.round((data.tasks.completed / data.tasks.total) * 100) : 0;
+    document.getElementById('tasks-progress').textContent = `${pct}%`;
+    document.getElementById('focus-time').textContent = data.focus.pretty;
+    document.getElementById('focus-sessions').textContent = data.focus.sessions;
+    document.getElementById('break-time').textContent = data.break.pretty;
+    document.getElementById('break-sessions').textContent = data.break.sessions;
 
-  const data = {
-    labels: ['Completed', 'Remaining'],
-    datasets: [{
-      label: 'Tasks',
-      data: [completedTasks, remainingTasks],
-      backgroundColor: ['#4a5cff', '#e5e7ff'],
-      borderWidth: 1
-    }]
-  };
+    const moodsTotal = Object.values(data.moods).reduce((a,b)=>a+b,0);
+    document.getElementById('mood-logs').textContent = moodsTotal;
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: 'bottom' },
-      title: { display: false }
-    }
-  };
+    // Charts
+    const tasksCtx = document.getElementById('tasksChart').getContext('2d');
+    new Chart(tasksCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Remaining'],
+        datasets: [{ label: 'Tasks', data: [data.tasks.completed, data.tasks.remaining] }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
 
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: data,
-    options: options
-  });
+    const minutesCtx = document.getElementById('minutesChart').getContext('2d');
+    new Chart(minutesCtx, {
+      type: 'line',
+      data: {
+        labels: data.charts.labels,
+        datasets: [
+          { label: 'Focus minutes', data: data.charts.focus_minutes },
+          { label: 'Break minutes', data: data.charts.break_minutes }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+  loadInsights().catch(console.error);
 </script>
 </body>
 </html>
