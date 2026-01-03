@@ -33,6 +33,27 @@
 <main class="container">
   <div class="card p-3 shadow-sm">
     <form class="task-form" method="POST">
+      <div class="row g-2">
+        <div class="col-12 col-md-6 mb-3">
+          <label class="form-label">Project</label>
+          <select class="form-select" name="project_id">
+            <option value="">No project</option>
+            {% for p in projects %}
+              <option value="{{ p.id }}"
+                {{ 'selected' if editing and task.project_id==p.id else '' }}
+              >{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+          <label class="form-label">Tags (comma separated)</label>
+          <input type="text" class="form-control" name="tags"
+                 placeholder="Study, Work" value="{{ (task.tags|join(', ')) if editing else '' }}">
+          {% if tags %}
+            <div class="form-text">Suggestions: {{ tags|join(', ') }}</div>
+          {% endif %}
+        </div>
+      </div>
       <div class="mb-3">
         <label class="form-label">Title</label>
         <input type="text" class="form-control" name="title" required
@@ -80,7 +101,7 @@
     </form>
 
     {% if editing %}
-    <form action="{{ url_for('tasks_bp.delete_task', task_id=task.id) }}" method="post" class="mt-3">
+    <form action="{{ url_for('tasks_bp.delete_task_route', task_id=task.id) }}" method="post" class="mt-3">
       <button type="submit" class="btn btn-danger"
               onclick="return confirm('Delete this task?');">Delete Task</button>
     </form>
@@ -89,5 +110,6 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='addtask.js') }}"></script>
 </body>
 </html>

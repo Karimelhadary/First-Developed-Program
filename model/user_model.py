@@ -2,7 +2,7 @@ from flask import current_app
 from utils.security import hash_password, verify_password
 
 
-def create_user(email: str, password: str):
+def create_user(name: str, email: str, password: str):
     """
     Insert a new user with salted+peppered hash.
     """
@@ -11,13 +11,44 @@ def create_user(email: str, password: str):
     hashed = hash_password(password)
 
     user = {
+        "name": name.strip() or "User",
         "email": email,
         "password_hash": hashed["hash"],
         "salt": hashed["salt"],
     }
 
     result = current_app.users.insert_one(user)
-    return str(result.inserted_id)
+    user_id = str(result.inserted_id)
+
+    # Create default settings for this user (pomodoro defaults)
+    current_app.settings.update_one(
+        {"user_id": user_id},
+        {
+            "$setOnInsert": {
+                "user_id": user_id,
+                "focus_minutes": 25,
+                "break_minutes": 5,
+                "long_break_minutes": 15,
+                "sessions_before_long_break": 4,
+            }
+        },
+        upsert=True,
+    )
+
+    # Create a "Personal" project so tasks can be grouped immediately
+    current_app.projects.update_one(
+        {"user_id": user_id, "name": "Personal"},
+        {
+            "$setOnInsert": {
+                "user_id": user_id,
+                "name": "Personal",
+                "created_at": None,
+            }
+        },
+        upsert=True,
+    )
+
+    return user_id
 
 
 def find_user_by_email(email: str):
