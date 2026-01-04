@@ -8,7 +8,12 @@
       <h1 class="tm-page-title h3 mb-1">Focus Timer</h1>
       <div class="tm-subtitle">Start a session, stay focused, and your progress will be saved automatically.</div>
     </div>
-    <a class="tm-muted-link" href="{{ url_for('dashboard_bp.dashboard') }}">← Back to dashboard</a>
+
+    <!-- UPDATED: Back to dashboard now looks like a proper button -->
+    <a href="{{ url_for('dashboard_bp.dashboard') }}"
+       class="btn btn-sm btn-outline-secondary tm-pill-btn">
+      <span class="me-1">←</span> Dashboard
+    </a>
   </div>
 
   <div class="tm-card card p-4 p-md-5 text-center">

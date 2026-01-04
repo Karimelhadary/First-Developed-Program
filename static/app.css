@@ -1,4 +1,3 @@
-
 :root{
   --tm-bg-start:#c9f3ef;
   --tm-bg-end:#d5d9ff;
@@ -123,4 +122,17 @@
 .tm-kpi .label{
   opacity: .75;
   font-size: .9rem;
+}
+
+/* ✅ NEW: small pill buttons for subtle navigation (View all, Back to dashboard) */
+.tm-pill-btn{
+  border-radius: 999px !important;
+  padding: .45rem .9rem;
+  font-weight: 600;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.tm-pill-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
 }
