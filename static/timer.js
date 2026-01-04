@@ -1,165 +1,108 @@
-// static/timer.js
-// Pomodoro-like timer with:
-// - Custom duration + mode
-// - Auto-save completed sessions via POST /api/focus-sessions or /api/break-sessions
-// - Uses GET /api/settings to preload default minutes
-// - Bootstrap modal when a focus session ends
 
-(function () {
-  async function getJSON(url) {
-    const res = await fetch(url, { credentials: 'same-origin' });
-    if (!res.ok) throw new Error('Request failed: ' + res.status);
-    return res.json();
-  }
+let intervalId = null;
+let remainingSeconds = 25 * 60;
 
-  async function postJSON(url, payload) {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error('Request failed: ' + res.status);
-    return res.json();
-  }
+const display = document.getElementById("timerDisplay");
+const subtitle = document.getElementById("timerSubtitle");
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
+const modeSelect = document.getElementById("modeSelect");
+const minutesInput = document.getElementById("minutesInput");
+const taskSelect = document.getElementById("taskSelect");
 
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-  }
+function fmt(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return `${m}:${s}`;
+}
 
-  document.addEventListener('DOMContentLoaded', async function () {
-    const display = document.getElementById('time');
-    if (!display) return;
+function modeDefaults(mode){
+  // Try to infer reasonable defaults from the current minutesInput:
+  // focus minutes already in the field; break = 5; long break = 15.
+  if(mode === "break") return 5;
+  if(mode === "long_break") return 15;
+  return parseInt(minutesInput.value || "25", 10);
+}
 
-    const startBtn = document.getElementById('start-btn');
-    const pauseBtn = document.getElementById('pause-btn');
-    const resetBtn = document.getElementById('reset-btn');
+function syncFromInputs(){
+  const mins = parseInt(minutesInput.value || "25", 10);
+  remainingSeconds = Math.max(1, mins) * 60;
+  display.textContent = fmt(remainingSeconds);
 
-    const modeSelect = document.getElementById('mode-select');
-    const minutesInput = document.getElementById('minutes-input');
-    const taskIdInput = document.getElementById('task-id-input');
-    const sessionLabel = document.getElementById('session-label');
+  const mode = modeSelect.value;
+  subtitle.textContent = mode === "focus" ? "Focus session" : (mode === "break" ? "Short break" : "Long break");
+}
 
-    let defaults = { focus_minutes: 25, break_minutes: 5, long_break_minutes: 15 };
-    try {
-      defaults = await getJSON('/api/settings');
-    } catch (e) {
-      // If settings endpoint fails, we just use defaults.
-      console.warn(e);
-    }
+async function logSession(mode, minutes, taskId){
+  const endpoint = mode === "focus" ? "/api/focus-sessions" : "/api/break-sessions";
+  const payload = { minutes: minutes };
+  if(mode === "focus" && taskId) payload.task_id = taskId;
 
-    function applyDefaults(mode) {
-      if (mode === 'focus') minutesInput.value = defaults.focus_minutes;
-      else if (mode === 'short_break') minutesInput.value = defaults.break_minutes;
-      else minutesInput.value = defaults.long_break_minutes;
-    }
-
-    // Initial defaults
-    applyDefaults(modeSelect.value);
-
-    let remaining = parseInt(minutesInput.value, 10) * 60;
-    let timerId = null;
-    let isRunning = false;
-
-    function render() {
-      display.textContent = formatTime(remaining);
-      const mode = modeSelect.value;
-      sessionLabel.textContent = mode === 'focus' ? 'Focus session' : (mode === 'short_break' ? 'Short break' : 'Long break');
-    }
-
-    function syncRemainingFromInput() {
-      const mins = Math.max(1, Math.min(180, parseInt(minutesInput.value || '25', 10)));
-      remaining = mins * 60;
-      render();
-    }
-
-    async function onComplete() {
-      // Prevent double complete
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-      isRunning = false;
-
-      const mode = modeSelect.value;
-      const minutes = Math.max(1, parseInt(minutesInput.value || '25', 10));
-
-      try {
-        if (mode === 'focus') {
-          await postJSON('/api/focus-sessions', {
-            minutes,
-            mode: 'focus',
-            task_id: (taskIdInput && taskIdInput.value || '').trim() || null
-          });
-
-          // Show bootstrap modal if present
-          const modalEl = document.getElementById('doneModal');
-          if (modalEl && window.bootstrap) {
-            const m = new window.bootstrap.Modal(modalEl);
-            m.show();
-          } else {
-            alert("Session saved. Time for a break!");
-          }
-        } else {
-          await postJSON('/api/break-sessions', {
-            minutes,
-            mode: mode
-          });
-          alert('Break logged. Ready to focus again?');
-        }
-      } catch (e) {
-        console.error(e);
-        alert('Session finished, but saving failed. Check server console.');
-      }
-    }
-
-    function tick() {
-      if (remaining > 0) {
-        remaining -= 1;
-        render();
-      } else {
-        onComplete();
-      }
-    }
-
-    function startTimer() {
-      if (isRunning) return;
-      isRunning = true;
-      timerId = setInterval(tick, 1000);
-    }
-
-    function pauseTimer() {
-      if (!isRunning) return;
-      isRunning = false;
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-    }
-
-    function resetTimer() {
-      pauseTimer();
-      syncRemainingFromInput();
-    }
-
-    // UI events
-    startBtn.addEventListener('click', startTimer);
-    pauseBtn.addEventListener('click', pauseTimer);
-    resetBtn.addEventListener('click', resetTimer);
-
-    modeSelect.addEventListener('change', function () {
-      pauseTimer();
-      applyDefaults(modeSelect.value);
-      syncRemainingFromInput();
-    });
-
-    minutesInput.addEventListener('change', function () {
-      if (!isRunning) syncRemainingFromInput();
-    });
-
-    // Initial
-    syncRemainingFromInput();
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
   });
-})();
+
+  // don't crash UI if API errors
+  try { return await res.json(); } catch(e){ return null; }
+}
+
+function start(){
+  if(intervalId) return;
+  startBtn.disabled = true;
+  pauseBtn.disabled = false;
+
+  intervalId = setInterval(async () => {
+    remainingSeconds -= 1;
+    display.textContent = fmt(remainingSeconds);
+
+    if(remainingSeconds <= 0){
+      clearInterval(intervalId);
+      intervalId = null;
+      pauseBtn.disabled = true;
+      startBtn.disabled = false;
+
+      const mode = modeSelect.value;
+      const minutes = parseInt(minutesInput.value || "25", 10);
+      const taskId = taskSelect ? taskSelect.value : "";
+
+      await logSession(mode, minutes, taskId);
+
+      // after focus -> break page
+      if(mode === "focus"){
+        window.location.href = "/break";
+      }else{
+        // after break -> timer page
+        window.location.href = "/timer";
+      }
+    }
+  }, 1000);
+}
+
+function pause(){
+  if(!intervalId) return;
+  clearInterval(intervalId);
+  intervalId = null;
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+}
+
+function reset(){
+  pause();
+  syncFromInputs();
+}
+
+modeSelect?.addEventListener("change", () => {
+  minutesInput.value = modeDefaults(modeSelect.value);
+  syncFromInputs();
+});
+minutesInput?.addEventListener("change", syncFromInputs);
+
+startBtn?.addEventListener("click", start);
+pauseBtn?.addEventListener("click", pause);
+resetBtn?.addEventListener("click", reset);
+
+// init
+syncFromInputs();

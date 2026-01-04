@@ -1,103 +1,70 @@
-// static/break.js
-// Simple break timer that loads default break minutes from /api/settings and
-// logs completion via POST /api/break-sessions.
 
-(function () {
-  async function getJSON(url) {
-    const res = await fetch(url, { credentials: 'same-origin' });
-    if (!res.ok) throw new Error('Request failed: ' + res.status);
-    return res.json();
-  }
+let intervalId = null;
+let remainingSeconds = 5 * 60;
 
-  async function postJSON(url, payload) {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(payload)
+const display = document.getElementById("breakTimerDisplay");
+const subtitle = document.getElementById("breakSubtitle");
+const startBtn = document.getElementById("breakStartBtn");
+const pauseBtn = document.getElementById("breakPauseBtn");
+const resetBtn = document.getElementById("breakResetBtn");
+
+function fmt(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return `${m}:${s}`;
+}
+
+function sync(){
+  display.textContent = fmt(remainingSeconds);
+}
+
+async function logBreak(minutes){
+  try{
+    await fetch("/api/break-sessions", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ minutes })
     });
-    if (!res.ok) throw new Error('Request failed: ' + res.status);
-    return res.json();
-  }
+  }catch(e){}
+}
 
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-  }
+function start(){
+  if(intervalId) return;
+  startBtn.disabled = true;
+  pauseBtn.disabled = false;
 
-  document.addEventListener('DOMContentLoaded', async function () {
-    const display = document.getElementById('break-time');
-    if (!display) return;
+  intervalId = setInterval(async () => {
+    remainingSeconds -= 1;
+    sync();
+    if(remainingSeconds <= 0){
+      clearInterval(intervalId);
+      intervalId = null;
+      pauseBtn.disabled = true;
+      startBtn.disabled = false;
 
-    const startBtn = document.getElementById('break-start');
-    const pauseBtn = document.getElementById('break-pause');
-    const resetBtn = document.getElementById('break-reset');
-
-    let defaults = { break_minutes: 5 };
-    try {
-      defaults = await getJSON('/api/settings');
-    } catch (e) {
-      console.warn(e);
+      await logBreak(5);
+      subtitle.textContent = "Break completed ✅";
     }
+  }, 1000);
+}
 
-    let remaining = (parseInt(defaults.break_minutes || 5, 10) || 5) * 60;
-    let timerId = null;
-    let isRunning = false;
+function pause(){
+  if(!intervalId) return;
+  clearInterval(intervalId);
+  intervalId = null;
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+}
 
-    function render() {
-      display.textContent = formatTime(remaining);
-    }
+function reset(){
+  pause();
+  remainingSeconds = 5 * 60;
+  subtitle.textContent = "Short break";
+  sync();
+}
 
-    async function onComplete() {
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-      isRunning = false;
-      const minutes = Math.max(1, Math.round(remaining / 60));
-      try {
-        await postJSON('/api/break-sessions', { minutes: parseInt(defaults.break_minutes || 5, 10), mode: 'short_break' });
-      } catch (e) {
-        console.error(e);
-      }
-      alert('Break finished ✅ Ready to focus?');
-    }
+startBtn?.addEventListener("click", start);
+pauseBtn?.addEventListener("click", pause);
+resetBtn?.addEventListener("click", reset);
 
-    function tick() {
-      if (remaining > 0) {
-        remaining -= 1;
-        render();
-      } else {
-        onComplete();
-      }
-    }
-
-    function start() {
-      if (isRunning) return;
-      isRunning = true;
-      timerId = setInterval(tick, 1000);
-    }
-
-    function pause() {
-      if (!isRunning) return;
-      isRunning = false;
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-    }
-
-    function reset() {
-      pause();
-      remaining = (parseInt(defaults.break_minutes || 5, 10) || 5) * 60;
-      render();
-    }
-
-    startBtn.addEventListener('click', start);
-    pauseBtn.addEventListener('click', pause);
-    resetBtn.addEventListener('click', reset);
-
-    render();
-  });
-})();
+sync();

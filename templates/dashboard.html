@@ -1,70 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard — Task Manager</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
-</head>
-<body>
-
-<input id="theme-toggle" type="checkbox" class="theme-toggle" />
-
-<div class="app">
-
-<header class="top">
-  <div class="greeting">
-    <h1>Hello!</h1>
-    <p class="muted">
-      Here are your tasks today.
-      <br>
-      Current mood: <strong>{{ mood_label }}</strong>
-    </p>
+{% extends "base.html" %}
+{% set active='dashboard' %}
+{% block title %}TaskManager — Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="tm-page-title h3 mb-1">Hello{% if user_name %}, {{ user_name }}{% endif %}!</h1>
+    <div class="tm-subtitle">Mood today: <span class="tm-chip">{{ mood_label }}</span></div>
   </div>
-  <label class="toggle" for="theme-toggle">🌞<span></span>🌙</label>
-</header>
 
-<main class="content">
+  <div class="d-flex gap-2">
+    <a class="btn btn-primary tm-primary-btn" href="{{ url_for('timer_break_bp.timer_page') }}">⏱️ Start Focus Session</a>
+    <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('tasks_bp.add_task') }}">＋ Add Task</a>
+  </div>
+</div>
 
-<section class="tasks card">
-  <h3>Your Tasks</h3>
-
-  <ul class="task-list">
-
-    {% for t in tasks %}
-    <li class="task{% if t.completed %} completed{% endif %}">
-
-      <span class="box"></span>
-
-      <div class="meta">
-        <div class="title">{{ t.title }}</div>
-        <div class="sub">{{ t.description }}</div>
-        <div class="sub">Due: {{ t.due_date }}</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-7">
+    <div class="tm-card card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Your tasks for today</h2>
+        <a class="tm-muted-link small" href="{{ url_for('tasks_bp.task_list') }}">View all</a>
       </div>
 
-      <span class="pill">{{ t.importance }}</span>
+      {% if tasks and tasks|length > 0 %}
+        <div class="list-group">
+          {% for t in tasks %}
+            <div class="list-group-item d-flex justify-content-between align-items-start gap-3">
+              <div class="me-auto">
+                <div class="fw-semibold">{{ t.title }}</div>
+                <div class="small opacity-75">
+                  {% if t.due_date %}Due: {{ t.due_date }} · {% endif %}
+                  Importance: {{ t.importance }} · Complexity: {{ t.complexity }}
+                </div>
+                {% if t.tags and t.tags|length > 0 %}
+                  <div class="mt-2">
+                    {% for tag in t.tags[:4] %}
+                      <span class="tm-chip">{{ tag }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <span class="badge rounded-pill text-bg-{{ 'success' if t.completed else 'secondary' }}">
+                {{ 'Done' if t.completed else 'Open' }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-4">
+          <div class="fs-1">✅</div>
+          <div class="fw-semibold">No tasks yet</div>
+          <div class="tm-subtitle mb-3">Create your first task to get started.</div>
+          <a class="btn btn-primary tm-primary-btn" href="{{ url_for('tasks_bp.add_task') }}">Add your first task</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 
-    </li>
-    {% else %}
-    <li class="task">
-      <div class="meta">No tasks yet.</div>
-    </li>
-    {% endfor %}
-
-  </ul>
-</section>
-
-<div class="actions">
-  <a class="btn add" href="{{ url_for('tasks_bp.add_task') }}">+ Add Task</a>
-  <a class="btn hollow" href="{{ url_for('timer_break_bp.timer') }}">⏱️ Start Focus Timer</a>
-  <a class="btn hollow" href="{{ url_for('insights_bp.insights') }}">📈 Insights</a>
-  <a class="btn hollow" href="{{ url_for('tasks_bp.task_list') }}">📋 All Tasks</a>
+  <div class="col-12 col-lg-5">
+    <div class="tm-card card p-4">
+      <h2 class="h5 mb-3">Quick actions</h2>
+      <div class="d-grid gap-2">
+        <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('insights_bp.insights') }}">📊 Insights</a>
+        <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('projects_bp.projects_list') }}">📁 Projects</a>
+        <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('settings_bp.settings_page') }}">⚙️ Settings</a>
+      </div>
+      <div class="tm-subtitle small mt-3">
+        Tip: start a focus session and your progress will appear in Insights automatically.
+      </div>
+    </div>
+  </div>
 </div>
-
-</main>
-</div>
-
-<script src="{{ url_for('static', filename='main.js') }}"></script>
-
-</body>
-</html>
+{% endblock %}

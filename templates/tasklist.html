@@ -1,64 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Task List — Task Management System</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='tasklist.css') }}" />
-</head>
-<body>
-  <header>
-    <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
-    <h2>All Tasks</h2>
-  </header>
+{% extends "base.html" %}
+{% set active='tasks' %}
+{% block title %}TaskManager — Tasks{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="tm-page-title h3 mb-1">All Tasks</h1>
+    <div class="tm-subtitle">Create, edit, and track your tasks in one place.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-primary tm-primary-btn" href="{{ url_for('tasks_bp.add_task') }}">＋ Add Task</a>
+  </div>
+</div>
 
-  <main class="container">
-    <div class="filters">
-      <form method="get">
-        <label>Sort by:
-          <select name="sort" onchange="this.form.submit()">
-            <option value="due_date" {% if sort == 'due_date' %}selected{% endif %}>Due Date</option>
-            <option value="importance" {% if sort == 'importance' %}selected{% endif %}>Importance</option>
-            <option value="complexity" {% if sort == 'complexity' %}selected{% endif %}>Complexity</option>
-          </select>
-        </label>
-      </form>
-    </div>
+<div class="tm-card card p-3 p-md-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <form method="get" class="d-flex align-items-center gap-2">
+      <label class="small opacity-75">Sort by</label>
+      <select class="form-select form-select-sm" name="sort" style="max-width: 200px;" onchange="this.form.submit()">
+        <option value="due_date" {% if sort=='due_date' %}selected{% endif %}>Due date</option>
+        <option value="importance" {% if sort=='importance' %}selected{% endif %}>Importance</option>
+        <option value="complexity" {% if sort=='complexity' %}selected{% endif %}>Complexity</option>
+      </select>
+      <noscript><button class="btn btn-sm btn-outline-secondary" type="submit">Apply</button></noscript>
+    </form>
 
-    <ul class="task-list">
+    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('timer_break_bp.timer_page') }}">⏱️ Start timer</a>
+  </div>
+
+  {% if tasks and tasks|length>0 %}
+    <div class="list-group">
       {% for t in tasks %}
-      <li class="{% if t.completed %}completed{% endif %}">
-        <div class="info">
-          <h3>{{ t.title }}</h3>
-          <p>Due: {{ t.due_date }}</p>
-          <p>Importance: {{ t.importance }}</p>
-          <p>Complexity: {{ t.complexity }}</p>
-        </div>
-        <div class="actions">
-          <form action="{{ url_for('tasks_bp.toggle_complete', task_id=t.id, sort=sort) }}" method="post" style="display:inline">
-            <button class="complete" type="submit">
-              {% if t.completed %}
-                ↩️ Mark as not done
-              {% else %}
-                ✅ Mark done
-              {% endif %}
-            </button>
-          </form>
+        <div class="list-group-item d-flex justify-content-between align-items-start gap-3">
+          <div class="me-auto">
+            <div class="d-flex align-items-center gap-2">
+              <div class="fw-semibold {% if t.completed %}text-decoration-line-through opacity-75{% endif %}">{{ t.title }}</div>
+              <span class="badge rounded-pill text-bg-{{ 'success' if t.completed else 'secondary' }}">{{ 'Done' if t.completed else 'Open' }}</span>
+            </div>
+            <div class="small opacity-75">
+              {% if t.due_date %}Due: {{ t.due_date }} · {% endif %}
+              Importance: {{ t.importance }} · Complexity: {{ t.complexity }}
+            </div>
+            {% if t.description %}
+              <div class="small mt-2">{{ t.description }}</div>
+            {% endif %}
+          </div>
 
-          <a href="{{ url_for('tasks_bp.edit_task', task_id=t.id) }}" class="edit">✏️</a>
+          <div class="d-flex align-items-center gap-2">
+            <form action="{{ url_for('tasks_bp.toggle_complete', task_id=t.id) }}" method="post" class="m-0">
+              <button class="btn btn-sm btn-outline-success" type="submit">
+                {% if t.completed %}Mark open{% else %}Mark done{% endif %}
+              </button>
+            </form>
 
-          <!-- FIXED: correct endpoint name is delete_task_route -->
-          <form action="{{ url_for('tasks_bp.delete_task_route', task_id=t.id) }}" method="post" style="display:inline">
-            <button class="delete" type="submit" aria-label="Delete">🗑️</button>
-          </form>
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks_bp.edit_task', task_id=t.id) }}">Edit</a>
+
+            <form action="{{ url_for('tasks_bp.delete_task_route', task_id=t.id) }}" method="post" class="m-0" onsubmit="return confirm('Delete this task?');">
+              <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+            </form>
+          </div>
         </div>
-      </li>
-      {% else %}
-      <li>No tasks yet. Add one!</li>
       {% endfor %}
-    </ul>
-
-    <a href="{{ url_for('tasks_bp.add_task') }}" class="btn primary">+ Add Task</a>
-  </main>
-</body>
-</html>
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <div class="fs-1">🗒️</div>
+      <div class="fw-semibold">No tasks yet</div>
+      <div class="tm-subtitle mb-3">Add your first task and start tracking your progress.</div>
+      <a class="btn btn-primary tm-primary-btn" href="{{ url_for('tasks_bp.add_task') }}">Add Task</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

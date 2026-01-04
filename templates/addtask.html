@@ -1,115 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ 'Edit Task' if editing else 'Add Task' }} — Task Management System</title>
-
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="{{ url_for('static', filename='addtask.css') }}">
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ url_for('splash_bp.splash') }}">TaskManager</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard_bp.dashboard') }}">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link active" href="{{ url_for('tasks_bp.task_list') }}">Tasks</a></li>
-      </ul>
+{% extends "base.html" %}
+{% set active='tasks' %}
+{% block title %}TaskManager — {% if editing %}Edit Task{% else %}Add Task{% endif %}{% endblock %}
+{% block content %}
+<div class="tm-form-card">
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+    <div>
+      <h1 class="tm-page-title h3 mb-1">{% if editing %}Edit Task{% else %}Add New Task{% endif %}</h1>
+      <div class="tm-subtitle">{% if editing %}Update details and save.{% else %}Create a task you can actually finish.{% endif %}</div>
     </div>
+    <a class="tm-muted-link" href="{{ url_for('tasks_bp.task_list') }}">← Back to tasks</a>
   </div>
-</nav>
 
-<header class="container mb-3">
-  <a href="{{ url_for('dashboard_bp.dashboard') }}" class="back">← Dashboard</a>
-  <h2>{{ 'Edit Task' if editing else 'Add New Task' }}</h2>
-</header>
-
-<main class="container">
-  <div class="card p-3 shadow-sm">
-    <form class="task-form" method="POST">
-      <div class="row g-2">
-        <div class="col-12 col-md-6 mb-3">
-          <label class="form-label">Project</label>
+  <div class="tm-card card p-4">
+    <form method="post">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label">Project <span class="opacity-75">(optional)</span></label>
           <select class="form-select" name="project_id">
-            <option value="">No project</option>
+            <option value="">No project assigned</option>
             {% for p in projects %}
               <option value="{{ p.id }}"
-                {{ 'selected' if editing and task.project_id==p.id else '' }}
-              >{{ p.name }}</option>
+                {% if editing and task.project_id == p.id %}selected{% endif %}>
+                {{ p.name }}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">Projects help you group tasks. You can manage projects in the Projects page.</div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Tags <span class="opacity-75">(comma separated)</span></label>
+          <input class="form-control" type="text" name="tags"
+                 value="{% if editing %}{{ task.tags|join(', ') }}{% endif %}"
+                 placeholder="Study, Work, Health" />
+          <div class="form-text">Suggestions: {{ tags|join(', ') }}</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Title</label>
+          <input class="form-control" type="text" name="title" required
+                 value="{% if editing %}{{ task.title }}{% endif %}"
+                 placeholder="e.g., Finish report, Study Chapter 4, Gym session" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Description <span class="opacity-75">(optional)</span></label>
+          <textarea class="form-control" name="description" rows="3" placeholder="What exactly do you need to do?">{% if editing %}{{ task.description }}{% endif %}</textarea>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label">Due date</label>
+          <input class="form-control" type="date" name="due_date" required
+                 value="{% if editing %}{{ task.due_date }}{% endif %}"/>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label">Importance</label>
+          <select class="form-select" name="importance">
+            {% set imp = (task.importance if editing else 'Low') %}
+            <option value="Low" {% if imp=='Low' %}selected{% endif %}>Low</option>
+            <option value="Medium" {% if imp=='Medium' %}selected{% endif %}>Medium</option>
+            <option value="High" {% if imp=='High' %}selected{% endif %}>High</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label">Complexity (1–5)</label>
+          {% set cx = (task.complexity if editing else 1) %}
+          <select class="form-select" name="complexity">
+            {% for n in range(1,6) %}
+              <option value="{{n}}" {% if cx==n %}selected{% endif %}>{{n}}</option>
             {% endfor %}
           </select>
         </div>
-        <div class="col-12 col-md-6 mb-3">
-          <label class="form-label">Tags (comma separated)</label>
-          <input type="text" class="form-control" name="tags"
-                 placeholder="Study, Work" value="{{ (task.tags|join(', ')) if editing else '' }}">
-          {% if tags %}
-            <div class="form-text">Suggestions: {{ tags|join(', ') }}</div>
-          {% endif %}
+
+        <div class="col-12 col-md-4">
+          <label class="form-label">Energy level (1–5)</label>
+          {% set en = (task.energy if editing else 1) %}
+          <select class="form-select" name="energy">
+            {% for n in range(1,6) %}
+              <option value="{{n}}" {% if en==n %}selected{% endif %}>{{n}}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">Helps mood-based suggestions work better.</div>
         </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input type="text" class="form-control" name="title" required
-               value="{{ task.title if editing else '' }}">
-      </div>
 
-      <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea class="form-control" name="description">{{ task.description if editing else '' }}</textarea>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Due Date</label>
-        <input type="date" class="form-control" name="due_date" required
-               value="{{ task.due_date if editing else '' }}">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Importance</label>
-        <select class="form-select" name="importance">
-          <option {{ 'selected' if editing and task.importance=='Low' }}>Low</option>
-          <option {{ 'selected' if editing and task.importance=='Medium' }}>Medium</option>
-          <option {{ 'selected' if editing and task.importance=='High' }}>High</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Complexity</label>
-        <input type="range" class="form-range" name="complexity" min="1" max="5"
-               value="{{ task.complexity if editing else '1' }}">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Energy Needed</label>
-        <input type="range" class="form-range" name="energy" min="1" max="5"
-               value="{{ task.energy if editing else '1' }}">
-      </div>
-
-      <div class="d-flex justify-content-between">
-        <a href="{{ url_for('tasks_bp.task_list') }}" class="btn btn-outline-secondary">Cancel</a>
-        <button class="btn btn-primary" type="submit">
-          {{ 'Update Task' if editing else 'Add Task' }}
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a class="btn btn-outline-secondary tm-primary-btn" href="{{ url_for('tasks_bp.task_list') }}">Cancel</a>
+        <button class="btn btn-primary tm-primary-btn" type="submit">
+          {% if editing %}Save changes{% else %}Create task{% endif %}
         </button>
       </div>
     </form>
-
-    {% if editing %}
-    <form action="{{ url_for('tasks_bp.delete_task_route', task_id=task.id) }}" method="post" class="mt-3">
-      <button type="submit" class="btn btn-danger"
-              onclick="return confirm('Delete this task?');">Delete Task</button>
-    </form>
-    {% endif %}
   </div>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='addtask.js') }}"></script>
-</body>
-</html>
+</div>
+{% endblock %}

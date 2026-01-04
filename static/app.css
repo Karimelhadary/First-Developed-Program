@@ -1,0 +1,126 @@
+
+:root{
+  --tm-bg-start:#c9f3ef;
+  --tm-bg-end:#d5d9ff;
+  --tm-card-radius:18px;
+}
+
+.app-body{
+  min-height:100vh;
+  background: radial-gradient(1200px 700px at 15% 10%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 55%),
+              linear-gradient(135deg, var(--tm-bg-start) 0%, var(--tm-bg-end) 100%);
+}
+
+[data-bs-theme="dark"] .app-body{
+  background: radial-gradient(1100px 650px at 15% 10%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 55%),
+              linear-gradient(135deg, #0b1220 0%, #101a2f 100%);
+}
+
+.tm-page-title{
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.tm-subtitle{
+  color: rgba(33,37,41,.72);
+}
+
+[data-bs-theme="dark"] .tm-subtitle{
+  color: rgba(255,255,255,.72);
+}
+
+.tm-card{
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: var(--tm-card-radius);
+  box-shadow: 0 10px 26px rgba(0,0,0,.10);
+}
+
+[data-bs-theme="dark"] .tm-card{
+  border-color: rgba(255,255,255,.10);
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+}
+
+.tm-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  padding:.35rem .6rem;
+  border-radius:999px;
+  font-size:.85rem;
+  border:1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.55);
+}
+
+[data-bs-theme="dark"] .tm-chip{
+  border-color: rgba(255,255,255,.14);
+  background: rgba(0,0,0,.25);
+}
+
+.tm-primary-btn{
+  border-radius: 999px;
+  padding: .8rem 1.2rem;
+  font-weight: 600;
+}
+
+.tm-section{
+  margin-top: 1.25rem;
+}
+
+.tm-muted-link{
+  color: rgba(13,110,253,.9);
+  text-decoration: none;
+}
+
+.tm-muted-link:hover{
+  text-decoration: underline;
+}
+
+.tm-form-card{
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.tm-auth-card{
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.tm-hero{
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.tm-timer{
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  font-size: clamp(3rem, 6vw, 4.25rem);
+}
+
+.tm-btn-row .btn{
+  border-radius: 999px;
+  padding: .65rem 1.1rem;
+  font-weight: 600;
+}
+
+.tm-kpi{
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.06);
+  background: rgba(255,255,255,.65);
+  padding: 1rem;
+}
+
+[data-bs-theme="dark"] .tm-kpi{
+  border-color: rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+}
+
+.tm-kpi .value{
+  font-weight: 800;
+  font-size: 1.4rem;
+}
+
+.tm-kpi .label{
+  opacity: .75;
+  font-size: .9rem;
+}
