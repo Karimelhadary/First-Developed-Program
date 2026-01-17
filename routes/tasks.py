@@ -18,11 +18,28 @@ tasks_bp = Blueprint("tasks_bp", __name__)
 @tasks_bp.route("/tasklist")
 @login_required
 def task_list():
-    """Show all tasks, with optional sorting."""
     sort_param = request.args.get("sort", "due_date")
+    project_id = request.args.get("project") or ""
     user_id = session.get("user_id")
-    tasks = get_all_tasks_sorted(user_id, sort_param)
-    return render_template("tasklist.html", tasks=tasks, sort=sort_param)
+
+    projects = list_projects(user_id)
+    project_name = {p["id"]: p["name"] for p in projects}
+
+    # filtered tasks
+    tasks = get_all_tasks_sorted(user_id, sort_param, project_id if project_id else None)
+
+    # enrich for UI
+    for t in tasks:
+        pid = t.get("project_id")
+        t["project_name"] = project_name.get(pid, "No project") if pid else "No project"
+
+    return render_template(
+        "tasklist.html",
+        tasks=tasks,
+        sort=sort_param,
+        projects=projects,
+        project_id=project_id,
+    )
 
 
 @tasks_bp.route("/addtask", methods=["GET", "POST"])
@@ -89,17 +106,18 @@ def edit_task(task_id):
 def delete_task_route(task_id):
     user_id = session.get("user_id")
     delete_task(user_id, task_id)
-    return redirect(url_for("tasks_bp.task_list"))
+    # keep filters if present
+    sort_param = request.args.get("sort", "due_date")
+    project_id = request.args.get("project", "")
+    return redirect(url_for("tasks_bp.task_list", sort=sort_param, project=project_id))
 
 
 @tasks_bp.route("/tasks/<task_id>/toggle_complete", methods=["POST"])
 @login_required
 def toggle_complete(task_id):
-    """Toggle the 'completed' status of a task."""
     user_id = session.get("user_id")
     toggle_task_complete(user_id, task_id)
 
-    sort_param = request.args.get("sort")
-    if sort_param:
-        return redirect(url_for("tasks_bp.task_list", sort=sort_param))
-    return redirect(url_for("tasks_bp.task_list"))
+    sort_param = request.args.get("sort", "due_date")
+    project_id = request.args.get("project", "")
+    return redirect(url_for("tasks_bp.task_list", sort=sort_param, project=project_id))

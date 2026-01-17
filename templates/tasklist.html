@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
   <div>
     <h1 class="tm-page-title h3 mb-1">All Tasks</h1>
-    <div class="tm-subtitle">Create, edit, and track your tasks in one place.</div>
+    <div class="tm-subtitle">Filter by project, sort, and manage your tasks.</div>
   </div>
   <div class="d-flex gap-2">
     <a class="btn btn-primary tm-primary-btn" href="{{ url_for('tasks_bp.add_task') }}">＋ Add Task</a>
@@ -14,13 +14,23 @@
 
 <div class="tm-card card p-3 p-md-4">
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-    <form method="get" class="d-flex align-items-center gap-2">
-      <label class="small opacity-75">Sort by</label>
+    <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
+      <label class="small opacity-75">Project</label>
+      <select class="form-select form-select-sm" name="project" style="max-width: 240px;" onchange="this.form.submit()">
+        <option value="" {% if not project_id %}selected{% endif %}>All projects</option>
+        <option value="__none__" {% if project_id=='__none__' %}selected{% endif %}>No project</option>
+        {% for p in projects %}
+          <option value="{{ p.id }}" {% if project_id==p.id %}selected{% endif %}>{{ p.name }}</option>
+        {% endfor %}
+      </select>
+
+      <label class="small opacity-75 ms-0 ms-md-2">Sort by</label>
       <select class="form-select form-select-sm" name="sort" style="max-width: 200px;" onchange="this.form.submit()">
         <option value="due_date" {% if sort=='due_date' %}selected{% endif %}>Due date</option>
         <option value="importance" {% if sort=='importance' %}selected{% endif %}>Importance</option>
         <option value="complexity" {% if sort=='complexity' %}selected{% endif %}>Complexity</option>
       </select>
+
       <noscript><button class="btn btn-sm btn-outline-secondary" type="submit">Apply</button></noscript>
     </form>
 
@@ -32,9 +42,10 @@
       {% for t in tasks %}
         <div class="list-group-item d-flex justify-content-between align-items-start gap-3">
           <div class="me-auto">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
               <div class="fw-semibold {% if t.completed %}text-decoration-line-through opacity-75{% endif %}">{{ t.title }}</div>
               <span class="badge rounded-pill text-bg-{{ 'success' if t.completed else 'secondary' }}">{{ 'Done' if t.completed else 'Open' }}</span>
+              <span class="badge rounded-pill text-bg-info">{{ t.project_name }}</span>
             </div>
             <div class="small opacity-75">
               {% if t.due_date %}Due: {{ t.due_date }} · {% endif %}
@@ -46,7 +57,7 @@
           </div>
 
           <div class="d-flex align-items-center gap-2">
-            <form action="{{ url_for('tasks_bp.toggle_complete', task_id=t.id) }}" method="post" class="m-0">
+            <form action="{{ url_for('tasks_bp.toggle_complete', task_id=t.id, sort=sort, project=project_id) }}" method="post" class="m-0">
               <button class="btn btn-sm btn-outline-success" type="submit">
                 {% if t.completed %}Mark open{% else %}Mark done{% endif %}
               </button>
@@ -54,7 +65,8 @@
 
             <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks_bp.edit_task', task_id=t.id) }}">Edit</a>
 
-            <form action="{{ url_for('tasks_bp.delete_task_route', task_id=t.id) }}" method="post" class="m-0" onsubmit="return confirm('Delete this task?');">
+            <form action="{{ url_for('tasks_bp.delete_task_route', task_id=t.id, sort=sort, project=project_id) }}" method="post"
+                  class="m-0" onsubmit="return confirm('Delete this task?');">
               <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
             </form>
           </div>
@@ -64,8 +76,8 @@
   {% else %}
     <div class="text-center py-5">
       <div class="fs-1">🗒️</div>
-      <div class="fw-semibold">No tasks yet</div>
-      <div class="tm-subtitle mb-3">Add your first task and start tracking your progress.</div>
+      <div class="fw-semibold">No tasks found</div>
+      <div class="tm-subtitle mb-3">Try switching the project filter, or add a new task.</div>
       <a class="btn btn-primary tm-primary-btn" href="{{ url_for('tasks_bp.add_task') }}">Add Task</a>
     </div>
   {% endif %}

@@ -41,8 +41,15 @@ def _audit(user_id: str, action: str, payload: dict):
 importance_rank = {"Low": 1, "Medium": 2, "High": 3}
 
 
-def get_all_tasks_sorted(user_id: str, sort_param: str):
-    docs = list(current_app.tasks.find({"user_id": user_id}))
+def get_all_tasks_sorted(user_id: str, sort_param: str, project_id: str | None = None):
+    query = {"user_id": user_id}
+    if project_id:
+        if project_id == "__none__":
+            query["project_id"] = None
+        else:
+            query["project_id"] = project_id
+
+    docs = list(current_app.tasks.find(query))
 
     if sort_param == "importance":
         docs.sort(key=lambda d: importance_rank.get(d.get("importance", "Low"), 0), reverse=True)
