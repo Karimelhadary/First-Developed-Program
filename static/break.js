@@ -1,65 +1,92 @@
-
 let intervalId = null;
-let remainingSeconds = 5 * 60;
 
 const display = document.getElementById("breakTimerDisplay");
 const subtitle = document.getElementById("breakSubtitle");
 const startBtn = document.getElementById("breakStartBtn");
 const pauseBtn = document.getElementById("breakPauseBtn");
 const resetBtn = document.getElementById("breakResetBtn");
+const configEl = document.getElementById("breakConfig");
 
-function fmt(sec){
-  const m = Math.floor(sec/60).toString().padStart(2,"0");
-  const s = Math.floor(sec%60).toString().padStart(2,"0");
+const STORAGE_KEY = "tm_focusCount";
+
+function readIntAttr(name, fallback) {
+  if (!configEl) return fallback;
+  const raw = configEl.getAttribute(name);
+  const n = parseInt(raw || "", 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function readStrAttr(name, fallback) {
+  if (!configEl) return fallback;
+  return configEl.getAttribute(name) || fallback;
+}
+
+const BREAK_MINUTES = readIntAttr("data-break-minutes", 5);
+const BREAK_MODE = readStrAttr("data-break-mode", "break");
+
+let remainingSeconds = Math.max(1, BREAK_MINUTES) * 60;
+
+function fmt(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = Math.floor(sec % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
 
-function sync(){
-  display.textContent = fmt(remainingSeconds);
+function sync() {
+  if (display) display.textContent = fmt(Math.max(0, remainingSeconds));
 }
 
-async function logBreak(minutes){
-  try{
+function setRunningUi(isRunning) {
+  if (startBtn) startBtn.disabled = isRunning;
+  if (pauseBtn) pauseBtn.disabled = !isRunning;
+}
+
+async function logBreak(minutes, mode) {
+  try {
     await fetch("/api/break-sessions", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ minutes })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ minutes, mode })
     });
-  }catch(e){}
+  } catch (e) {
+    // ignore
+  }
 }
 
-function start(){
-  if(intervalId) return;
-  startBtn.disabled = true;
-  pauseBtn.disabled = false;
+function start() {
+  if (intervalId) return;
+  setRunningUi(true);
 
   intervalId = setInterval(async () => {
     remainingSeconds -= 1;
     sync();
-    if(remainingSeconds <= 0){
+
+    if (remainingSeconds <= 0) {
       clearInterval(intervalId);
       intervalId = null;
-      pauseBtn.disabled = true;
-      startBtn.disabled = false;
+      setRunningUi(false);
 
-      await logBreak(5);
-      subtitle.textContent = "Break completed ✅";
+      await logBreak(BREAK_MINUTES, BREAK_MODE);
+
+      if (subtitle) subtitle.textContent = "Break completed ✅";
+      if (BREAK_MODE === "long_break") {
+        localStorage.setItem(STORAGE_KEY, "0");
+      }
     }
   }, 1000);
 }
 
-function pause(){
-  if(!intervalId) return;
+function pause() {
+  if (!intervalId) return;
   clearInterval(intervalId);
   intervalId = null;
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
+  setRunningUi(false);
 }
 
-function reset(){
+function reset() {
   pause();
-  remainingSeconds = 5 * 60;
-  subtitle.textContent = "Short break";
+  remainingSeconds = Math.max(1, BREAK_MINUTES) * 60;
+  if (subtitle) subtitle.textContent = BREAK_MODE === "long_break" ? "Long break" : "Short break";
   sync();
 }
 
@@ -67,4 +94,4 @@ startBtn?.addEventListener("click", start);
 pauseBtn?.addEventListener("click", pause);
 resetBtn?.addEventListener("click", reset);
 
-sync();
+reset();

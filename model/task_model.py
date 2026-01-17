@@ -1,12 +1,19 @@
-from flask import current_app
-from bson import ObjectId
+from __future__ import annotations
+
 from datetime import datetime
+from bson import ObjectId
+from bson.errors import InvalidId
+from flask import current_app
 
 
-# ---------- helpers ----------
+def _safe_object_id(oid: str):
+    try:
+        return ObjectId(oid)
+    except (InvalidId, TypeError):
+        return None
+
 
 def _mongo_to_task(doc):
-    """Convert a MongoDB document to a simple dict usable in templates."""
     return {
         "id": str(doc["_id"]),
         "user_id": doc.get("user_id"),
@@ -22,55 +29,39 @@ def _mongo_to_task(doc):
     }
 
 
+def _audit(user_id: str, action: str, payload: dict):
+    try:
+        current_app.audit_logs.insert_one(
+            {"user_id": user_id, "action": action, "created_at": datetime.utcnow(), "payload": payload}
+        )
+    except Exception:
+        pass
+
+
 importance_rank = {"Low": 1, "Medium": 2, "High": 3}
 
 
-# ---------- list / sorting ----------
-
 def get_all_tasks_sorted(user_id: str, sort_param: str):
-    """
-    Return all tasks as a list of dicts, sorted according to sort_param.
-
-    sort_param in {"due_date", "importance", "complexity"}.
-    """
     docs = list(current_app.tasks.find({"user_id": user_id}))
 
     if sort_param == "importance":
-        # High -> Medium -> Low
-        docs.sort(
-            key=lambda d: importance_rank.get(d.get("importance", "Low"), 0),
-            reverse=True,
-        )
+        docs.sort(key=lambda d: importance_rank.get(d.get("importance", "Low"), 0), reverse=True)
     elif sort_param == "complexity":
-        # 5 -> 1
         docs.sort(key=lambda d: d.get("complexity", 1), reverse=True)
     else:
-        # due_date: earliest -> latest
         docs.sort(key=lambda d: d.get("due_date", ""))
 
     return [_mongo_to_task(d) for d in docs]
 
 
 def get_tasks_for_dashboard(user_id: str, mood: str):
-    """
-    Return tasks sorted based on the user's mood.
-
-    energetic -> most complex first
-    focused   -> high importance & complex first
-    calm      -> easiest first
-    creative  -> lowest "energy" first
-    default   -> by due date
-    """
     docs = list(current_app.tasks.find({"user_id": user_id}))
 
     if mood == "energetic":
         docs.sort(key=lambda d: d.get("complexity", 1), reverse=True)
     elif mood == "focused":
         docs.sort(
-            key=lambda d: (
-                importance_rank.get(d.get("importance", "Low"), 0),
-                d.get("complexity", 1),
-            ),
+            key=lambda d: (importance_rank.get(d.get("importance", "Low"), 0), d.get("complexity", 1)),
             reverse=True,
         )
     elif mood == "calm":
@@ -83,53 +74,53 @@ def get_tasks_for_dashboard(user_id: str, mood: str):
     return [_mongo_to_task(d) for d in docs]
 
 
-# ---------- single-task operations ----------
-
 def get_task_by_id(user_id: str, task_id: str):
-    doc = current_app.tasks.find_one({"_id": ObjectId(task_id), "user_id": user_id})
-    if not doc:
+    oid = _safe_object_id(task_id)
+    if not oid:
         return None
-    return _mongo_to_task(doc)
+    doc = current_app.tasks.find_one({"_id": oid, "user_id": user_id})
+    return _mongo_to_task(doc) if doc else None
 
 
 def insert_task(user_id: str, task_data: dict):
-    """Insert a new task. task_data is a plain dict with fields."""
     task_data = {**task_data, "user_id": user_id}
     result = current_app.tasks.insert_one(task_data)
-    current_app.audit_logs.insert_one(
-        {
-            "user_id": user_id,
-            "action": "CREATE_TASK",
-            "created_at": datetime.utcnow(),
-            "payload": {"task_id": str(result.inserted_id)},
-        }
-    )
+    _audit(user_id, "CREATE_TASK", {"task_id": str(result.inserted_id)})
     return str(result.inserted_id)
 
 
 def update_task(user_id: str, task_id: str, updates: dict) -> bool:
-    result = current_app.tasks.update_one(
-        {"_id": ObjectId(task_id), "user_id": user_id},
-        {"$set": updates},
-    )
-    return result.modified_count > 0
+    oid = _safe_object_id(task_id)
+    if not oid:
+        return False
+    result = current_app.tasks.update_one({"_id": oid, "user_id": user_id}, {"$set": updates})
+    if result.modified_count > 0:
+        _audit(user_id, "UPDATE_TASK", {"task_id": task_id, "updates": list(updates.keys())})
+        return True
+    return False
 
 
 def delete_task(user_id: str, task_id: str) -> bool:
-    result = current_app.tasks.delete_one({"_id": ObjectId(task_id), "user_id": user_id})
-    return result.deleted_count > 0
+    oid = _safe_object_id(task_id)
+    if not oid:
+        return False
+    result = current_app.tasks.delete_one({"_id": oid, "user_id": user_id})
+    if result.deleted_count > 0:
+        _audit(user_id, "DELETE_TASK", {"task_id": task_id})
+        return True
+    return False
 
 
-def toggle_task_complete(user_id: str, task_id: str) -> bool:
-    """Flip completed True/False and return the new value."""
-    doc = current_app.tasks.find_one({"_id": ObjectId(task_id), "user_id": user_id})
+def toggle_task_complete(user_id: str, task_id: str):
+    oid = _safe_object_id(task_id)
+    if not oid:
+        return False
+
+    doc = current_app.tasks.find_one({"_id": oid, "user_id": user_id})
     if not doc:
         return False
 
     new_value = not doc.get("completed", False)
-
-    current_app.tasks.update_one(
-        {"_id": ObjectId(task_id), "user_id": user_id},
-        {"$set": {"completed": new_value}},
-    )
+    current_app.tasks.update_one({"_id": oid, "user_id": user_id}, {"$set": {"completed": new_value}})
+    _audit(user_id, "TOGGLE_TASK", {"task_id": task_id, "completed": new_value})
     return new_value

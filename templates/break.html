@@ -2,13 +2,19 @@
 {% set active='timer' %}
 {% block title %}TaskManager — Break{% endblock %}
 {% block content %}
+
+<div id="breakConfig"
+     data-break-minutes="{{ break_minutes if break_minutes else (settings.break_minutes if settings else 5) }}"
+     data-break-mode="{{ break_mode if break_mode else 'break' }}"
+     hidden></div>
+
 <div class="tm-auth-card" style="max-width:760px;">
   <div class="tm-card card p-4 p-md-5 text-center">
     <h1 class="tm-page-title h3 mb-1">Break time</h1>
     <div class="tm-subtitle mb-4">Step away, breathe, and reset your focus.</div>
 
     <div class="tm-timer" id="breakTimerDisplay">05:00</div>
-    <div class="tm-subtitle mt-1" id="breakSubtitle">Short break</div>
+    <div class="tm-subtitle mt-1" id="breakSubtitle">{{ break_title if break_title else 'Short break' }}</div>
 
     <div class="tm-btn-row d-flex justify-content-center gap-2 mt-4 flex-wrap">
       <button class="btn btn-primary" id="breakStartBtn">Start</button>

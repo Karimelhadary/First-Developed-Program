@@ -1,4 +1,3 @@
-
 let intervalId = null;
 let remainingSeconds = 25 * 60;
 
@@ -10,99 +9,148 @@ const resetBtn = document.getElementById("resetBtn");
 const modeSelect = document.getElementById("modeSelect");
 const minutesInput = document.getElementById("minutesInput");
 const taskSelect = document.getElementById("taskSelect");
+const configEl = document.getElementById("timerConfig");
 
-function fmt(sec){
-  const m = Math.floor(sec/60).toString().padStart(2,"0");
-  const s = Math.floor(sec%60).toString().padStart(2,"0");
+function readIntAttr(name, fallback) {
+  if (!configEl) return fallback;
+  const raw = configEl.getAttribute(name);
+  const n = parseInt(raw || "", 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+const SETTINGS = {
+  focusMinutes: readIntAttr("data-focus-minutes", 25),
+  breakMinutes: readIntAttr("data-break-minutes", 5),
+  longBreakMinutes: readIntAttr("data-long-break-minutes", 15),
+  sessionsBeforeLongBreak: readIntAttr("data-sessions-before-long-break", 4)
+};
+
+const STORAGE_KEY = "tm_focusCount";
+
+function fmt(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = Math.floor(sec % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
 
-function modeDefaults(mode){
-  // Try to infer reasonable defaults from the current minutesInput:
-  // focus minutes already in the field; break = 5; long break = 15.
-  if(mode === "break") return 5;
-  if(mode === "long_break") return 15;
-  return parseInt(minutesInput.value || "25", 10);
+function clampInt(n, min, max, fallback) {
+  const x = parseInt(n, 10);
+  if (!Number.isFinite(x)) return fallback;
+  return Math.max(min, Math.min(max, x));
 }
 
-function syncFromInputs(){
-  const mins = parseInt(minutesInput.value || "25", 10);
-  remainingSeconds = Math.max(1, mins) * 60;
-  display.textContent = fmt(remainingSeconds);
-
-  const mode = modeSelect.value;
-  subtitle.textContent = mode === "focus" ? "Focus session" : (mode === "break" ? "Short break" : "Long break");
+function modeLabel(mode) {
+  if (mode === "break") return "Short break";
+  if (mode === "long_break") return "Long break";
+  return "Focus session";
 }
 
-async function logSession(mode, minutes, taskId){
+function modeDefaultMinutes(mode) {
+  if (mode === "break") return SETTINGS.breakMinutes;
+  if (mode === "long_break") return SETTINGS.longBreakMinutes;
+  return SETTINGS.focusMinutes;
+}
+
+function syncFromInputs() {
+  const mode = modeSelect?.value || "focus";
+  const mins = clampInt(minutesInput?.value, 1, 180, modeDefaultMinutes(mode));
+  if (minutesInput) minutesInput.value = mins;
+
+  remainingSeconds = mins * 60;
+  if (display) display.textContent = fmt(remainingSeconds);
+  if (subtitle) subtitle.textContent = modeLabel(mode);
+}
+
+function getFocusCount() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  const n = parseInt(raw || "0", 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function setFocusCount(n) {
+  localStorage.setItem(STORAGE_KEY, String(Math.max(0, n)));
+}
+
+async function logSession(mode, minutes, taskId) {
   const endpoint = mode === "focus" ? "/api/focus-sessions" : "/api/break-sessions";
-  const payload = { minutes: minutes };
-  if(mode === "focus" && taskId) payload.task_id = taskId;
+  const payload = { minutes };
+  if (mode === "focus" && taskId) payload.task_id = taskId;
+  if (mode !== "focus") payload.mode = mode;
 
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  // don't crash UI if API errors
-  try { return await res.json(); } catch(e){ return null; }
+  try {
+    await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    // ignore API errors so UI never crashes
+  }
 }
 
-function start(){
-  if(intervalId) return;
-  startBtn.disabled = true;
-  pauseBtn.disabled = false;
+function setRunningUi(isRunning) {
+  if (startBtn) startBtn.disabled = isRunning;
+  if (pauseBtn) pauseBtn.disabled = !isRunning;
+}
+
+function start() {
+  if (intervalId) return;
+  syncFromInputs();
+  setRunningUi(true);
 
   intervalId = setInterval(async () => {
     remainingSeconds -= 1;
-    display.textContent = fmt(remainingSeconds);
+    if (display) display.textContent = fmt(Math.max(0, remainingSeconds));
 
-    if(remainingSeconds <= 0){
+    if (remainingSeconds <= 0) {
       clearInterval(intervalId);
       intervalId = null;
-      pauseBtn.disabled = true;
-      startBtn.disabled = false;
+      setRunningUi(false);
 
-      const mode = modeSelect.value;
-      const minutes = parseInt(minutesInput.value || "25", 10);
+      const mode = modeSelect?.value || "focus";
+      const minutes = clampInt(minutesInput?.value, 1, 180, modeDefaultMinutes(mode));
       const taskId = taskSelect ? taskSelect.value : "";
 
       await logSession(mode, minutes, taskId);
 
-      // after focus -> break page
-      if(mode === "focus"){
-        window.location.href = "/break";
-      }else{
-        // after break -> timer page
+      if (mode === "focus") {
+        const cycles = Math.max(1, SETTINGS.sessionsBeforeLongBreak);
+        const newCount = getFocusCount() + 1;
+        setFocusCount(newCount);
+
+        const isLongBreak = newCount % cycles === 0;
+        const breakMode = isLongBreak ? "long_break" : "break";
+        window.location.href = `/break?mode=${breakMode}`;
+      } else {
         window.location.href = "/timer";
       }
     }
   }, 1000);
 }
 
-function pause(){
-  if(!intervalId) return;
+function pause() {
+  if (!intervalId) return;
   clearInterval(intervalId);
   intervalId = null;
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
+  setRunningUi(false);
 }
 
-function reset(){
+function reset() {
   pause();
   syncFromInputs();
 }
 
 modeSelect?.addEventListener("change", () => {
-  minutesInput.value = modeDefaults(modeSelect.value);
+  const mode = modeSelect.value;
+  minutesInput.value = modeDefaultMinutes(mode);
   syncFromInputs();
 });
+
 minutesInput?.addEventListener("change", syncFromInputs);
 
 startBtn?.addEventListener("click", start);
 pauseBtn?.addEventListener("click", pause);
 resetBtn?.addEventListener("click", reset);
 
-// init
 syncFromInputs();
+setRunningUi(false);

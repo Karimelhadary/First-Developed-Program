@@ -2,6 +2,14 @@
 {% set active='timer' %}
 {% block title %}TaskManager — Focus Timer{% endblock %}
 {% block content %}
+
+<div id="timerConfig"
+     data-focus-minutes="{{ settings.focus_minutes if settings else 25 }}"
+     data-break-minutes="{{ settings.break_minutes if settings else 5 }}"
+     data-long-break-minutes="{{ settings.long_break_minutes if settings else 15 }}"
+     data-sessions-before-long-break="{{ settings.sessions_before_long_break if settings else 4 }}"
+     hidden></div>
+
 <div class="tm-form-card" style="max-width:980px;">
   <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
     <div>
@@ -9,7 +17,6 @@
       <div class="tm-subtitle">Start a session, stay focused, and your progress will be saved automatically.</div>
     </div>
 
-    <!-- UPDATED: Back to dashboard now looks like a proper button -->
     <a href="{{ url_for('dashboard_bp.dashboard') }}"
        class="btn btn-sm btn-outline-secondary tm-pill-btn">
       <span class="me-1">←</span> Dashboard
@@ -28,11 +35,14 @@
           <option value="break">Break</option>
           <option value="long_break">Long break</option>
         </select>
+        <div class="form-text">A long break triggers every {{ settings.sessions_before_long_break if settings else 4 }} focus sessions.</div>
       </div>
 
       <div class="col-12 col-md-4">
         <label class="form-label">Minutes</label>
-        <input class="form-control" id="minutesInput" type="number" min="1" max="180" value="{{ settings.focus_minutes if settings else 25 }}">
+        <input class="form-control" id="minutesInput" type="number" min="1" max="180"
+               value="{{ settings.focus_minutes if settings else 25 }}">
+        <div class="form-text">Defaults follow your Settings (Focus / Break / Long break).</div>
       </div>
 
       <div class="col-12 col-md-4">
@@ -43,7 +53,7 @@
             <option value="{{ t.id }}">{{ t.title }}</option>
           {% endfor %}
         </select>
-        <div class="form-text">If you link a task, Insights can show which tasks got focus time.</div>
+        <div class="form-text">Insights can show which tasks got your focus time.</div>
       </div>
     </div>
 
