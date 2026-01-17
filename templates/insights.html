@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
   <div>
     <h1 class="tm-page-title h3 mb-1">Insights</h1>
-    <div class="tm-subtitle">A quick look at your week: tasks, focus time, and mood logs.</div>
+    <div class="tm-subtitle">A quick look at your week: tasks, focus time, mood logs, and where your focus went.</div>
   </div>
   <div class="tm-subtitle small">Data updates automatically after you complete tasks or timers.</div>
 </div>
@@ -14,12 +14,16 @@
   <div class="col-12 col-lg-5">
     <div class="tm-card card p-4">
       <h2 class="h5 mb-3">This week's summary</h2>
-      <div id="summary" class="vstack gap-2">
+      <div class="vstack gap-2">
         <div class="tm-kpi"><div class="label">Tasks completed</div><div class="value" id="kpiTasks">—</div></div>
         <div class="tm-kpi"><div class="label">Overall progress</div><div class="value" id="kpiProgress">—</div></div>
         <div class="tm-kpi"><div class="label">Focus time</div><div class="value" id="kpiFocus">—</div></div>
         <div class="tm-kpi"><div class="label">Break time</div><div class="value" id="kpiBreak">—</div></div>
+        <div class="tm-kpi"><div class="label">Unlinked focus time</div><div class="value" id="kpiUnlinked">—</div></div>
         <div class="tm-kpi"><div class="label">Mood logs</div><div class="value" id="kpiMood">—</div></div>
+      </div>
+      <div class="small opacity-75 mt-3">
+        Tip: link your Focus Timer to a task to see “Top focused tasks” below.
       </div>
     </div>
   </div>
@@ -33,6 +37,69 @@
     <div class="tm-card card p-4">
       <h2 class="h5 mb-3">Focus vs break minutes</h2>
       <canvas id="minutesChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-12 col-lg-6">
+    <div class="tm-card card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Top focused tasks</h2>
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks_bp.task_list') }}">View tasks</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr class="opacity-75">
+              <th>Task</th>
+              <th class="text-nowrap">Project</th>
+              <th class="text-end text-nowrap">Minutes</th>
+              <th class="text-end text-nowrap">Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="topTasksBody">
+            <tr><td colspan="4" class="opacity-75">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="noTopTasks" class="text-center py-4 d-none">
+        <div class="fs-1">⏱️</div>
+        <div class="fw-semibold">No linked focus sessions yet</div>
+        <div class="tm-subtitle">Go to Timer → pick a task → start a focus session.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="tm-card card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Projects summary</h2>
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('projects_bp.projects_list') }}">View projects</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr class="opacity-75">
+              <th>Project</th>
+              <th class="text-end text-nowrap">Tasks</th>
+              <th class="text-end text-nowrap">Focus min</th>
+            </tr>
+          </thead>
+          <tbody id="projectsBody">
+            <tr><td colspan="3" class="opacity-75">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="noProjects" class="text-center py-4 d-none">
+        <div class="fs-1">📁</div>
+        <div class="fw-semibold">No projects yet</div>
+        <div class="tm-subtitle">Create a project and assign tasks to it.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -50,11 +117,11 @@
     document.getElementById("kpiProgress").textContent = `${data.tasks.progress_pct}%`;
     document.getElementById("kpiFocus").textContent = `${data.timer.focus_minutes}m (${data.timer.focus_sessions} sessions)`;
     document.getElementById("kpiBreak").textContent = `${data.timer.break_minutes}m (${data.timer.break_sessions} sessions)`;
+    document.getElementById("kpiUnlinked").textContent = `${data.timer.unlinked_focus_minutes}m (${data.timer.unlinked_focus_sessions} sessions)`;
     document.getElementById("kpiMood").textContent = `${data.mood.logs}`;
 
     // charts
-    const tasksCtx = document.getElementById('tasksChart').getContext('2d');
-    new Chart(tasksCtx, {
+    new Chart(document.getElementById('tasksChart').getContext('2d'), {
       type: 'doughnut',
       data: {
         labels: ['Completed', 'Remaining'],
@@ -63,8 +130,7 @@
       options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
 
-    const minutesCtx = document.getElementById('minutesChart').getContext('2d');
-    new Chart(minutesCtx, {
+    new Chart(document.getElementById('minutesChart').getContext('2d'), {
       type: 'line',
       data: {
         labels: data.charts.labels,
@@ -75,7 +141,55 @@
       },
       options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
+
+    // Top focused tasks
+    const topTasksBody = document.getElementById("topTasksBody");
+    const noTopTasks = document.getElementById("noTopTasks");
+    topTasksBody.innerHTML = "";
+
+    if (!data.top_tasks || data.top_tasks.length === 0){
+      noTopTasks.classList.remove("d-none");
+    } else {
+      noTopTasks.classList.add("d-none");
+      for (const t of data.top_tasks){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(t.title)}</td>
+          <td class="text-nowrap opacity-75">${escapeHtml(t.project || "No project")}</td>
+          <td class="text-end">${t.minutes}m</td>
+          <td class="text-end">${t.sessions}</td>
+        `;
+        topTasksBody.appendChild(tr);
+      }
+    }
+
+    // Projects summary
+    const projectsBody = document.getElementById("projectsBody");
+    const noProjects = document.getElementById("noProjects");
+    projectsBody.innerHTML = "";
+
+    if (!data.projects || data.projects.length === 0){
+      noProjects.classList.remove("d-none");
+    } else {
+      noProjects.classList.add("d-none");
+      for (const p of data.projects){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(p.name)}</td>
+          <td class="text-end">${p.tasks_done}/${p.tasks_total}</td>
+          <td class="text-end">${p.focus_minutes}m</td>
+        `;
+        projectsBody.appendChild(tr);
+      }
+    }
   }
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[c]));
+  }
+
   loadInsights().catch(console.error);
 </script>
 {% endblock %}

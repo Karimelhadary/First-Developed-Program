@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% set active='projects' %}
+{% block title %}TaskManager — {{ project.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+  <div>
+    <h1 class="tm-page-title h3 mb-1">{{ project.name }}</h1>
+    <div class="tm-subtitle">Tasks and focus stats for this project.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('projects_bp.projects_list') }}">← Back</a>
+    <a class="btn btn-sm btn-primary" href="{{ url_for('tasks_bp.add_task') }}">＋ Add task</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <div class="tm-card card p-4">
+      <h2 class="h5 mb-3">Project summary</h2>
+      <div class="tm-kpi"><div class="label">Tasks completed</div><div class="value">{{ stats.done }}/{{ stats.total }}</div></div>
+      <div class="tm-kpi mt-2"><div class="label">Total focus time</div><div class="value">{{ stats.focus_minutes }}m</div></div>
+      <div class="small opacity-75 mt-3">Tip: link timer sessions to tasks to grow these stats.</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-8">
+    <div class="tm-card card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Tasks in this project</h2>
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('timer_break_bp.timer_page') }}">⏱️ Start timer</a>
+      </div>
+
+      {% if tasks and tasks|length > 0 %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr class="opacity-75">
+                <th>Task</th>
+                <th class="text-nowrap">Due</th>
+                <th class="text-end text-nowrap">Focus</th>
+                <th class="text-end text-nowrap">Sessions</th>
+                <th class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in tasks %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold {% if t.completed %}text-decoration-line-through opacity-75{% endif %}">
+                      {{ t.title }}
+                    </div>
+                    <div class="small opacity-75">Importance: {{ t.importance }} · Complexity: {{ t.complexity }}</div>
+                  </td>
+                  <td class="text-nowrap">{{ t.due_date or "—" }}</td>
+                  <td class="text-end">{{ t.focus_minutes }}m</td>
+                  <td class="text-end">{{ t.focus_sessions }}</td>
+                  <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('tasks_bp.edit_task', task_id=t.id) }}">Edit</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <div class="fs-1">🗒️</div>
+          <div class="fw-semibold">No tasks in this project yet</div>
+          <div class="tm-subtitle mb-3">Add tasks and assign them to this project.</div>
+          <a class="btn btn-primary" href="{{ url_for('tasks_bp.add_task') }}">Add task</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

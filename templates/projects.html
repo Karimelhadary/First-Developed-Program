@@ -2,23 +2,39 @@
 {% set active='projects' %}
 {% block title %}TaskManager — Projects{% endblock %}
 {% block content %}
+
 <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
   <div>
     <h1 class="tm-page-title h3 mb-1">Projects</h1>
-    <div class="tm-subtitle">Group tasks by topic (Study, Work, Personal, etc.).</div>
+    <div class="tm-subtitle">Projects are “task folders” with their own progress and focus stats.</div>
   </div>
   <a class="btn btn-primary tm-primary-btn" href="{{ url_for('projects_bp.projects_new') }}">＋ New project</a>
 </div>
 
 <div class="tm-card card p-4">
-  {% if projects and projects|length>0 %}
+  {% if projects and projects|length > 0 %}
     <div class="list-group">
       {% for p in projects %}
-        <div class="list-group-item d-flex justify-content-between align-items-center">
-          <div class="fw-semibold">{{ p.name }}</div>
+        <div class="list-group-item d-flex justify-content-between align-items-center gap-3 flex-wrap">
+          <div class="me-auto">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <a class="fw-semibold text-decoration-none"
+                 href="{{ url_for('projects_bp.project_detail', project_id=p.id) }}">
+                {{ p.name }}
+              </a>
+              <span class="badge rounded-pill text-bg-secondary">{{ p.tasks_done }}/{{ p.tasks_total }} done</span>
+              <span class="badge rounded-pill text-bg-info">{{ p.focus_minutes }}m focus</span>
+            </div>
+            <div class="small opacity-75 mt-1">Click to view tasks + focus time inside this project.</div>
+          </div>
+
           <div class="d-flex gap-2">
-            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('projects_bp.projects_edit', project_id=p.id) }}">Rename</a>
-            <form class="m-0" method="post" action="{{ url_for('projects_bp.projects_delete', project_id=p.id) }}" onsubmit="return confirm('Delete this project? Tasks will stay, but will lose the project label.');">
+            <a class="btn btn-sm btn-outline-secondary"
+               href="{{ url_for('projects_bp.projects_edit', project_id=p.id) }}">Rename</a>
+
+            <form class="m-0" method="post"
+                  action="{{ url_for('projects_bp.projects_delete', project_id=p.id) }}"
+                  onsubmit="return confirm('Delete this project? Tasks will stay, but will lose the project label.');">
               <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
             </form>
           </div>
@@ -29,9 +45,10 @@
     <div class="text-center py-5">
       <div class="fs-1">📁</div>
       <div class="fw-semibold">No projects yet</div>
-      <div class="tm-subtitle mb-3">Create a project to keep related tasks together.</div>
+      <div class="tm-subtitle mb-3">Create a project and assign tasks to it.</div>
       <a class="btn btn-primary tm-primary-btn" href="{{ url_for('projects_bp.projects_new') }}">Create project</a>
     </div>
   {% endif %}
 </div>
+
 {% endblock %}
