@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% set active='dashboard' %}
 {% block title %}TaskManager — Dashboard{% endblock %}
+
 {% block content %}
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
   <div>
@@ -14,29 +15,86 @@
   </div>
 </div>
 
-<div class="row g-3">
+<!-- KPIs -->
+<div class="row g-3 mb-1">
+  <div class="col-12 col-md-3">
+    <div class="tm-kpi">
+      <div class="label">Open tasks</div>
+      <div class="value">{{ kpis.open }}</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="tm-kpi">
+      <div class="label">Completed</div>
+      <div class="value">{{ kpis.done }}</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="tm-kpi tm-kpi-danger">
+      <div class="label">Overdue</div>
+      <div class="value">{{ kpis.overdue }}</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-3">
+    <div class="tm-kpi tm-kpi-warn">
+      <div class="label">Due soon</div>
+      <div class="value">{{ kpis.due_soon }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+
+  <!-- LEFT: Suggested / Smart list -->
   <div class="col-12 col-lg-7">
     <div class="tm-card card p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h5 mb-0">Your tasks for today</h2>
-
-        <!-- UPDATED: View all now looks like a proper button -->
-        <a href="{{ url_for('tasks_bp.task_list') }}"
-           class="btn btn-sm btn-outline-primary tm-pill-btn">
+        <h2 class="h5 mb-0">Suggested focus plan</h2>
+        <a href="{{ url_for('tasks_bp.task_list') }}" class="btn btn-sm btn-outline-primary tm-pill-btn">
           View all <span class="ms-1">→</span>
         </a>
       </div>
 
-      {% if tasks and tasks|length > 0 %}
+      {% if suggested and suggested|length > 0 %}
         <div class="list-group">
-          {% for t in tasks %}
-            <div class="list-group-item d-flex justify-content-between align-items-start gap-3">
+          {% for t in suggested %}
+            <div class="list-group-item tm-task-row tm-due-{{ t.due_status }} tm-imp-{{ t.importance_code }}
+                        d-flex justify-content-between align-items-start gap-3">
               <div class="me-auto">
-                <div class="fw-semibold">{{ t.title }}</div>
-                <div class="small opacity-75">
-                  {% if t.due_date %}Due: {{ t.due_date }} · {% endif %}
-                  Importance: {{ t.importance }} · Complexity: {{ t.complexity }}
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <div class="fw-semibold">{{ t.title }}</div>
+
+                  <!-- due badge -->
+                  {% if t.due_status == 'overdue' %}
+                    <span class="badge rounded-pill text-bg-danger">Overdue</span>
+                  {% elif t.due_status == 'today' %}
+                    <span class="badge rounded-pill text-bg-warning">Due today</span>
+                  {% elif t.due_status == 'soon' %}
+                    <span class="badge rounded-pill text-bg-info">Due in {{ t.days_left }}d</span>
+                  {% elif t.due_status == 'later' %}
+                    <span class="badge rounded-pill text-bg-secondary">Due in {{ t.days_left }}d</span>
+                  {% else %}
+                    <span class="badge rounded-pill text-bg-secondary">No due date</span>
+                  {% endif %}
+
+                  <!-- importance badge -->
+                  {% if t.importance == 'High' %}
+                    <span class="badge rounded-pill text-bg-warning">High priority</span>
+                  {% elif t.importance == 'Medium' %}
+                    <span class="badge rounded-pill text-bg-secondary">Medium</span>
+                  {% else %}
+                    <span class="badge rounded-pill text-bg-secondary">Low</span>
+                  {% endif %}
+
+                  <!-- project -->
+                  <span class="badge rounded-pill text-bg-dark tm-project-badge">{{ t.project_name }}</span>
                 </div>
+
+                <div class="small opacity-75 mt-1">
+                  Complexity: {{ t.complexity }}
+                  · Focus: {{ t.focus_minutes }}m ({{ t.focus_sessions }} sessions)
+                </div>
+
                 {% if t.tags and t.tags|length > 0 %}
                   <div class="mt-2">
                     {% for tag in t.tags[:4] %}
@@ -45,9 +103,11 @@
                   </div>
                 {% endif %}
               </div>
-              <span class="badge rounded-pill text-bg-{{ 'success' if t.completed else 'secondary' }}">
-                {{ 'Done' if t.completed else 'Open' }}
-              </span>
+
+              <div class="d-flex flex-column align-items-end gap-2">
+                <span class="badge rounded-pill text-bg-secondary">Open</span>
+                <a class="btn btn-sm btn-outline-primary tm-pill-btn" href="{{ url_for('timer_break_bp.timer_page') }}">⏱️ Focus</a>
+              </div>
             </div>
           {% endfor %}
         </div>
@@ -62,19 +122,134 @@
     </div>
   </div>
 
+  <!-- RIGHT: Smart panels -->
   <div class="col-12 col-lg-5">
-    <div class="tm-card card p-4">
-      <h2 class="h5 mb-3">Quick actions</h2>
+    <div class="tm-card card p-4 mb-3">
+      <h2 class="h5 mb-3">Attention needed</h2>
 
-      <div class="d-grid gap-2">
-        <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('insights_bp.insights') }}">📊 Insights</a>
-        <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('projects_bp.projects_list') }}">📁 Projects</a>
-        <a class="btn btn-outline-primary tm-primary-btn" href="{{ url_for('settings_bp.settings_page') }}">⚙️ Settings</a>
-      </div>
-      <div class="tm-subtitle small mt-3">
-        Tip: start a focus session and your progress will appear in Insights automatically.
-      </div>
+      {% if overdue and overdue|length>0 %}
+        <div class="mb-3">
+          <div class="small opacity-75 mb-2">Overdue</div>
+          <div class="list-group">
+            {% for t in overdue %}
+              <div class="list-group-item tm-task-row tm-due-overdue d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  <div class="small opacity-75">{{ t.project_name }}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-danger">Overdue</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if due_today and due_today|length>0 %}
+        <div class="mb-3">
+          <div class="small opacity-75 mb-2">Due today</div>
+          <div class="list-group">
+            {% for t in due_today %}
+              <div class="list-group-item tm-task-row tm-due-today d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  <div class="small opacity-75">{{ t.project_name }}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-warning">Today</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if due_soon and due_soon|length>0 %}
+        <div>
+          <div class="small opacity-75 mb-2">Due soon</div>
+          <div class="list-group">
+            {% for t in due_soon %}
+              <div class="list-group-item tm-task-row tm-due-soon d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  <div class="small opacity-75">{{ t.project_name }}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-info">{{ t.days_left }}d</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if (not overdue or overdue|length==0) and (not due_today or due_today|length==0) and (not due_soon or due_soon|length==0) %}
+        <div class="text-center py-4">
+          <div class="fs-1">🌿</div>
+          <div class="fw-semibold">Nothing urgent</div>
+          <div class="tm-subtitle">You’re on track. Pick something from your focus plan.</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="tm-card card p-4">
+      <h2 class="h5 mb-3">Smart suggestions</h2>
+
+      {% if quick_wins and quick_wins|length>0 %}
+        <div class="mb-3">
+          <div class="small opacity-75 mb-2">Quick wins (easy + urgent)</div>
+          <div class="list-group">
+            {% for t in quick_wins %}
+              <div class="list-group-item tm-task-row tm-due-{{ t.due_status }} d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  <div class="small opacity-75">{{ t.project_name }} · Complexity {{ t.complexity }}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-secondary">{{ t.focus_minutes }}m</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if neglected_urgent and neglected_urgent|length>0 %}
+        <div class="mb-3">
+          <div class="small opacity-75 mb-2">Neglected but urgent (0 focus)</div>
+          <div class="list-group">
+            {% for t in neglected_urgent %}
+              <div class="list-group-item tm-task-row tm-neglected tm-due-{{ t.due_status }} d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  <div class="small opacity-75">{{ t.project_name }}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-secondary">0m</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if big_rocks and big_rocks|length>0 %}
+        <div>
+          <div class="small opacity-75 mb-2">Big rocks (highest complexity)</div>
+          <div class="list-group">
+            {% for t in big_rocks %}
+              <div class="list-group-item tm-task-row tm-imp-{{ t.importance_code }} d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ t.title }}</div>
+                  <div class="small opacity-75">{{ t.project_name }} · Complexity {{ t.complexity }}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-info">{{ t.complexity }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if (not quick_wins or quick_wins|length==0) and (not neglected_urgent or neglected_urgent|length==0) and (not big_rocks or big_rocks|length==0) %}
+        <div class="text-center py-4">
+          <div class="fs-1">✨</div>
+          <div class="fw-semibold">Nothing to suggest</div>
+          <div class="tm-subtitle">Add tasks with due dates or track focus to unlock suggestions.</div>
+        </div>
+      {% endif %}
     </div>
   </div>
+
 </div>
 {% endblock %}

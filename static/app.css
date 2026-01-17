@@ -2,12 +2,29 @@
   --tm-bg-start:#c9f3ef;
   --tm-bg-end:#d5d9ff;
   --tm-card-radius:18px;
+
+  /* semantic colors (light theme) */
+  --tm-danger:#dc3545;
+  --tm-warn:#ffc107;
+  --tm-info:#0dcaf0;
+  --tm-muted:#6c757d;
+  --tm-success:#198754;
+  --tm-dark:#212529;
 }
 
 .app-body{
   min-height:100vh;
   background: radial-gradient(1200px 700px at 15% 10%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 55%),
               linear-gradient(135deg, var(--tm-bg-start) 0%, var(--tm-bg-end) 100%);
+}
+
+[data-bs-theme="dark"]{
+  --tm-danger:#ff5a6a;
+  --tm-warn:#ffd25a;
+  --tm-info:#6be7ff;
+  --tm-muted:#9aa4b2;
+  --tm-success:#59d98e;
+  --tm-dark:#e9ecef;
 }
 
 [data-bs-theme="dark"] .app-body{
@@ -124,7 +141,7 @@
   font-size: .9rem;
 }
 
-/* ✅ NEW: small pill buttons for subtle navigation (View all, Back to dashboard) */
+/* small pill buttons */
 .tm-pill-btn{
   border-radius: 999px !important;
   padding: .45rem .9rem;
@@ -135,4 +152,42 @@
 .tm-pill-btn:hover{
   transform: translateY(-1px);
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.08);
+}
+
+/* ---------------------------
+   SMART DASHBOARD SEMANTICS
+---------------------------- */
+
+/* KPI semantic hints */
+.tm-kpi-danger{ border-left: 4px solid var(--tm-danger); }
+.tm-kpi-warn{ border-left: 4px solid var(--tm-warn); }
+
+/* task row semantic border */
+.tm-task-row{
+  border-left: 4px solid rgba(0,0,0,.10);
+  border-radius: 12px;
+}
+
+[data-bs-theme="dark"] .tm-task-row{
+  border-left-color: rgba(255,255,255,.14);
+}
+
+/* due-date semantics */
+.tm-due-overdue{ border-left-color: var(--tm-danger) !important; }
+.tm-due-today{ border-left-color: var(--tm-warn) !important; }
+.tm-due-soon{ border-left-color: var(--tm-info) !important; }
+.tm-due-later{ border-left-color: rgba(13,110,253,.45) !important; }
+.tm-due-none{ border-left-color: rgba(108,117,125,.45) !important; }
+
+/* importance semantics */
+.tm-imp-high{ box-shadow: inset 0 0 0 9999px rgba(255,193,7,.08); }
+.tm-imp-med{ box-shadow: inset 0 0 0 9999px rgba(13,110,253,.06); }
+.tm-imp-low{ box-shadow: none; }
+
+/* neglected */
+.tm-neglected{ border-left-color: rgba(108,117,125,.65) !important; }
+
+/* project badge readability */
+.tm-project-badge{
+  opacity: .92;
 }
