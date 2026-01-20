@@ -78,7 +78,6 @@ def _insights_payload(user_id: str) -> dict:
     days = [(today - timedelta(days=i)) for i in range(6, -1, -1)]
     labels = [d.strftime("%a") for d in days]
 
-# Function: sum_by_day (reads input, applies logic, returns response/value)
 
     # -------------------------------
     # FUNCTION: sum_by_day
