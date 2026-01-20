@@ -22,6 +22,10 @@ const taskSelect = document.getElementById("taskSelect");
 const configEl = document.getElementById("timerConfig");
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function readIntAttr(name, fallback) {
   if (!configEl) return fallback;
   const raw = configEl.getAttribute(name);
@@ -39,6 +43,10 @@ const SETTINGS = {
 const STORAGE_KEY = "tm_focusCount";
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function fmt(sec) {
   const m = Math.floor(sec / 60).toString().padStart(2, "0");
   const s = Math.floor(sec % 60).toString().padStart(2, "0");
@@ -46,6 +54,10 @@ function fmt(sec) {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function clampInt(n, min, max, fallback) {
   const x = parseInt(n, 10);
   if (!Number.isFinite(x)) return fallback;
@@ -53,6 +65,10 @@ function clampInt(n, min, max, fallback) {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function modeLabel(mode) {
   if (mode === "break") return "Short break";
   if (mode === "long_break") return "Long break";
@@ -60,6 +76,10 @@ function modeLabel(mode) {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function modeDefaultMinutes(mode) {
   if (mode === "break") return SETTINGS.breakMinutes;
   if (mode === "long_break") return SETTINGS.longBreakMinutes;
@@ -67,6 +87,10 @@ function modeDefaultMinutes(mode) {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function syncFromInputs() {
   const mode = modeSelect?.value || "focus";
   const mins = clampInt(minutesInput?.value, 1, 180, modeDefaultMinutes(mode));
@@ -78,6 +102,10 @@ function syncFromInputs() {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function getFocusCount() {
   const raw = localStorage.getItem(STORAGE_KEY);
   const n = parseInt(raw || "0", 10);
@@ -85,6 +113,10 @@ function getFocusCount() {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function setFocusCount(n) {
   localStorage.setItem(STORAGE_KEY, String(Math.max(0, n)));
 }
@@ -95,6 +127,7 @@ async function logSession(mode, minutes, taskId) {
   if (mode === "focus" && taskId) payload.task_id = taskId;
   if (mode !== "focus") payload.mode = mode;
 
+  // Control-flow: starts a 'try' block
   try {
 // Network request: fetch() calls an API endpoint and returns a Promise
     await fetch(endpoint, {
@@ -108,12 +141,20 @@ async function logSession(mode, minutes, taskId) {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function setRunningUi(isRunning) {
   if (startBtn) startBtn.disabled = isRunning;
   if (pauseBtn) pauseBtn.disabled = !isRunning;
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function start() {
   if (intervalId) return;
   syncFromInputs();
@@ -123,6 +164,7 @@ function start() {
     remainingSeconds -= 1;
     if (display) display.textContent = fmt(Math.max(0, remainingSeconds));
 
+    // Control-flow: starts a 'if' block
     if (remainingSeconds <= 0) {
       clearInterval(intervalId);
       intervalId = null;
@@ -134,6 +176,7 @@ function start() {
 
       await logSession(mode, minutes, taskId);
 
+      // Control-flow: starts a 'if' block
       if (mode === "focus") {
         const cycles = Math.max(1, SETTINGS.sessionsBeforeLongBreak);
         const newCount = getFocusCount() + 1;
@@ -150,6 +193,10 @@ function start() {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function pause() {
   if (!intervalId) return;
   clearInterval(intervalId);
@@ -158,12 +205,17 @@ function pause() {
 }
 
 // Function definition: reusable logic block
+
+// -------------------------------
+// Function block: read this as input -> processing -> output
+// -------------------------------
 function reset() {
   pause();
   syncFromInputs();
 }
 
 // Event listener: runs a function when the user triggers an event
+// Event listener: runs the callback when the event occurs
 modeSelect?.addEventListener("change", () => {
   const mode = modeSelect.value;
   minutesInput.value = modeDefaultMinutes(mode);
@@ -171,13 +223,17 @@ modeSelect?.addEventListener("change", () => {
 });
 
 // Event listener: runs a function when the user triggers an event
+// Event listener: runs the callback when the event occurs
 minutesInput?.addEventListener("change", syncFromInputs);
 
 // Event listener: runs a function when the user triggers an event
+// Event listener: runs the callback when the event occurs
 startBtn?.addEventListener("click", start);
 // Event listener: runs a function when the user triggers an event
+// Event listener: runs the callback when the event occurs
 pauseBtn?.addEventListener("click", pause);
 // Event listener: runs a function when the user triggers an event
+// Event listener: runs the callback when the event occurs
 resetBtn?.addEventListener("click", reset);
 
 syncFromInputs();

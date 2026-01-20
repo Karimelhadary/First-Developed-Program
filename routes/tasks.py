@@ -1,5 +1,5 @@
 
-
+# --- Imports used in this file (what we need from libraries/modules) ---
 from flask import Blueprint, render_template, request, redirect, url_for, abort, session
 
 from utils.auth import login_required
@@ -21,9 +21,16 @@ tasks_bp = Blueprint("tasks_bp", __name__)
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @tasks_bp.route("/tasklist")
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: task_list (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: task_list
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def task_list():
     sort_param = request.args.get("sort", "due_date")
     project_id = request.args.get("project") or ""
@@ -36,6 +43,7 @@ def task_list():
     tasks = get_all_tasks_sorted(user_id, sort_param, project_id if project_id else None)
 
     # enrich for UI
+    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for t in tasks:
         pid = t.get("project_id")
         t["project_name"] = project_name.get(pid, "No project") if pid else "No project"
@@ -50,15 +58,23 @@ def task_list():
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @tasks_bp.route("/addtask", methods=["GET", "POST"])
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: add_task (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: add_task
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def add_task():
     user_id = session.get("user_id")
 
     # Ensure default tags exist (useful for demo + rubric)
     ensure_tags_exist(user_id, ["Study", "Work", "Health", "Personal"])
 
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if request.method == "POST":
         tags_raw = request.form.get("tags", "")
         tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
@@ -82,15 +98,24 @@ def add_task():
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @tasks_bp.route("/tasks/<task_id>/edit", methods=["GET", "POST"])
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: edit_task (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: edit_task
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def edit_task(task_id):
     user_id = session.get("user_id")
     task = get_task_by_id(user_id, task_id)
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not task:
         abort(404)
 
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if request.method == "POST":
         tags_raw = request.form.get("tags", "")
         tags = [t.strip() for t in tags_raw.split(",") if t.strip()]
@@ -113,9 +138,16 @@ def edit_task(task_id):
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @tasks_bp.route("/tasks/<task_id>/delete", methods=["POST"])
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: delete_task_route (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: delete_task_route
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def delete_task_route(task_id):
     user_id = session.get("user_id")
     delete_task(user_id, task_id)
@@ -126,9 +158,16 @@ def delete_task_route(task_id):
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @tasks_bp.route("/tasks/<task_id>/toggle_complete", methods=["POST"])
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: toggle_complete (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: toggle_complete
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def toggle_complete(task_id):
     user_id = session.get("user_id")
     toggle_task_complete(user_id, task_id)

@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% set active='projects' %}
 {% block title %}TaskManager — {% if editing %}Edit Project{% else %}New Project{% endif %}{% endblock %}
@@ -7,6 +8,7 @@
     <h1 class="tm-page-title h4 mb-1">{% if editing %}Rename project{% else %}Create a new project{% endif %}</h1>
     <p class="tm-subtitle mb-4">Use projects to group tasks and keep your dashboard tidy.</p>
 
+    <!-- FORM: user input fields + submit buttons -->
     <form method="post">
       <div class="mb-3">
         <label class="form-label">Project name</label>

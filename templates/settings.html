@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% set active='settings' %}
 {% block title %}TaskManager — Settings{% endblock %}
@@ -11,6 +12,7 @@
   </div>
 
   <div class="tm-card card p-4">
+    <!-- FORM: user input fields + submit buttons -->
     <form method="post">
       <div class="row g-3">
         <div class="col-12">
@@ -64,6 +66,7 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- SCRIPT: attaches JS behavior to this page -->
 <script>
   const toggle = document.getElementById('themeToggle');
   const hidden = document.getElementById('themeHidden');

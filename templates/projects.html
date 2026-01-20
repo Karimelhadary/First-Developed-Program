@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% set active='projects' %}
 {% block title %}TaskManager — Projects{% endblock %}
@@ -32,6 +33,7 @@
             <a class="btn btn-sm btn-outline-secondary"
                href="{{ url_for('projects_bp.projects_edit', project_id=p.id) }}">Rename</a>
 
+            <!-- FORM: user input fields + submit buttons -->
             <form class="m-0" method="post"
                   action="{{ url_for('projects_bp.projects_delete', project_id=p.id) }}"
                   onsubmit="return confirm('Delete this project? Tasks will stay, but will lose the project label.');">

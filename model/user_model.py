@@ -1,4 +1,5 @@
 
+# --- Imports used in this file (what we need from libraries/modules) ---
 from flask import current_app
 from utils.security import hash_password, verify_password
 
@@ -6,6 +7,11 @@ from utils.security import hash_password, verify_password
 
 
 # Function: create_user (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: create_user
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def create_user(name: str, email: str, password: str):
     """
     Insert a new user with salted+peppered hash.
@@ -21,12 +27,12 @@ def create_user(name: str, email: str, password: str):
         "salt": hashed["salt"],
     }
 
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     result = current_app.users.insert_one(user)
     user_id = str(result.inserted_id)
 
     # Create default settings for this user (pomodoro defaults)
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     current_app.settings.update_one(
         {"user_id": user_id},
         {
@@ -42,7 +48,7 @@ def create_user(name: str, email: str, password: str):
     )
 
     # Create a "Personal" project so tasks can be grouped immediately
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     current_app.projects.update_one(
         {"user_id": user_id, "name": "Personal"},
         {
@@ -59,11 +65,21 @@ def create_user(name: str, email: str, password: str):
 
 
 # Function: find_user_by_email (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: find_user_by_email
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def find_user_by_email(email: str):
     email = email.lower().strip()
     return current_app.users.find_one({"email": email})
 
 
+
+# -------------------------------
+# FUNCTION: verify_user
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def verify_user(email: str, password: str) -> bool:
     """
     Verify user credentials.
@@ -74,10 +90,12 @@ def verify_user(email: str, password: str) -> bool:
       (so the app doesn't crash with KeyError)
     """
     user = find_user_by_email(email)
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not user:
         return False
 
     # --- New style: hashed password with salt+pepper ---
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if "salt" in user and "password_hash" in user:
         return verify_password(
             password,
@@ -88,6 +106,7 @@ def verify_user(email: str, password: str) -> bool:
     # --- Legacy style: plain-text password (old accounts) ---
     # This is just here so your project doesn't crash on old data.
     # New accounts created via /register will NOT use this anymore.
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if "password" in user:
         return user["password"] == password
 

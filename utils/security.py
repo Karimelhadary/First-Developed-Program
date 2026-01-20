@@ -1,5 +1,5 @@
 
-
+# --- Imports used in this file (what we need from libraries/modules) ---
 import os
 import hashlib
 import binascii
@@ -10,6 +10,11 @@ from flask import current_app
 
 SALT_LEN = 16
 
+
+# -------------------------------
+# FUNCTION: hash_password
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def hash_password(password: str) -> dict:
     """
     Hash password using SHA256 + salt + pepper.
@@ -34,6 +39,11 @@ def hash_password(password: str) -> dict:
     }
 
 
+
+# -------------------------------
+# FUNCTION: verify_password
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def verify_password(password: str, salt_hex: str, stored_hash: str) -> bool:
     """
     Check if password matches stored hash.

@@ -1,4 +1,5 @@
 
+/* Selector: body (styles for this element/class/id) */
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #fefaff, #eaf7ff);
@@ -9,6 +10,7 @@ body {
   align-items: center;
 }
 
+/* Selector: header (styles for this element/class/id) */
 header {
   width: 100%;
   max-width: 800px;
@@ -18,6 +20,7 @@ header {
   align-items: center;
 }
 
+/* Selector: .container (styles for this element/class/id) */
 .container {
   background: #fff;
   width: 90%;
@@ -27,19 +30,23 @@ header {
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
+/* Selector: .summary, .chart, .quote (styles for this element/class/id) */
 .summary, .chart, .quote {
   margin-bottom: 25px;
 }
 
+/* Selector: .summary h3, .chart h3 (styles for this element/class/id) */
 .summary h3, .chart h3 {
   color: #4a5cff;
 }
 
+/* Selector: img (styles for this element/class/id) */
 img {
   width: 100%;
   border-radius: 8px;
 }
 
+/* Selector: blockquote (styles for this element/class/id) */
 blockquote {
   font-style: italic;
   color: #555;

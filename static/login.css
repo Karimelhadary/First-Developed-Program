@@ -1,10 +1,12 @@
 
+/* Selector: * (styles for this element/class/id) */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Selector: body (styles for this element/class/id) */
 body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   background: linear-gradient(135deg, #ffe6e6, #e6f0ff);
@@ -15,6 +17,7 @@ body {
   min-height: 100vh;
 }
 
+/* Selector: .login-box (styles for this element/class/id) */
 .login-box {
   background: white;
   padding: 35px;
@@ -24,39 +27,46 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
+/* Selector: .login-box h1 (styles for this element/class/id) */
 .login-box h1 {
   text-align: center;
   margin-bottom: 10px;
 }
 
+/* Selector: .login-box p (styles for this element/class/id) */
 .login-box p {
   text-align: center;
   color: #666;
   margin-bottom: 25px;
 }
 
+/* Selector: form (styles for this element/class/id) */
 form {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+/* Selector: label (styles for this element/class/id) */
 label {
   font-size: 14px;
   color: #444;
 }
 
+/* Selector: input (styles for this element/class/id) */
 input {
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
 
+/* Selector: input:focus (styles for this element/class/id) */
 input:focus {
   outline: none;
   border-color: #4a5cff;
 }
 
+/* Selector: button (styles for this element/class/id) */
 button {
   background: #4a5cff;
   color: white;
@@ -67,16 +77,19 @@ button {
   cursor: pointer;
 }
 
+/* Selector: button:hover (styles for this element/class/id) */
 button:hover {
   background: #3c4ae6;
 }
 
+/* Selector: .or (styles for this element/class/id) */
 .or {
   text-align: center;
   color: #666;
   margin: 15px 0;
 }
 
+/* Selector: .google-btn (styles for this element/class/id) */
 .google-btn {
   display: block;
   text-align: center;
@@ -88,17 +101,20 @@ button:hover {
   font-weight: bold;
 }
 
+/* Selector: .google-btn:hover (styles for this element/class/id) */
 .google-btn:hover {
   background: #4a5cff;
   color: white;
 }
 
+/* Selector: p.small (styles for this element/class/id) */
 p.small {
   text-align: center;
   margin-top: 10px;
   font-size: 14px;
 }
 
+/* Selector: p.small a (styles for this element/class/id) */
 p.small a {
   color: #4a5cff;
   text-decoration: none;

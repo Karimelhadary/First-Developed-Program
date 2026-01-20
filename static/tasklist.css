@@ -1,4 +1,5 @@
 
+/* Selector: body (styles for this element/class/id) */
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(120deg, #dffaff, #f3e8ff);
@@ -9,6 +10,7 @@ body {
   min-height: 100vh;
 }
 
+/* Selector: header (styles for this element/class/id) */
 header {
   width: 100%;
   max-width: 800px;
@@ -18,6 +20,7 @@ header {
   align-items: center;
 }
 
+/* Selector: .container (styles for this element/class/id) */
 .container {
   background: #fff;
   width: 90%;
@@ -27,10 +30,12 @@ header {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Selector: .filters (styles for this element/class/id) */
 .filters {
   margin-bottom: 15px;
 }
 
+/* Selector: .task-list (styles for this element/class/id) */
 .task-list {
   list-style: none;
   display: flex;
@@ -38,6 +43,7 @@ header {
   gap: 10px;
 }
 
+/* Selector: .task-list li (styles for this element/class/id) */
 .task-list li {
   display: flex;
   justify-content: space-between;
@@ -48,35 +54,42 @@ header {
   background: #fafbff;
 }
 
+/* Selector: .task-list li:hover (styles for this element/class/id) */
 .task-list li:hover {
   background: #f5f5ff;
 }
 
+/* Selector: .task-list li.completed .info h3 (styles for this element/class/id) */
 .task-list li.completed .info h3 {
   text-decoration: line-through;
   opacity: 0.7;
 }
 
+/* Selector: .info p (styles for this element/class/id) */
 .info p {
   margin: 2px 0;
 }
 
+/* Selector: .actions (styles for this element/class/id) */
 .actions {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
+/* Selector: .actions a (styles for this element/class/id) */
 .actions a {
   text-decoration: none;
   font-size: 18px;
 }
 
+/* Selector: .actions form (styles for this element/class/id) */
 .actions form {
   display: inline-block;
 }
 
 button.complete,
+/* Selector: button.delete (styles for this element/class/id) */
 button.delete {
   border: none;
   background: none;
@@ -85,14 +98,17 @@ button.delete {
   padding: 4px 6px;
 }
 
+/* Selector: button.complete (styles for this element/class/id) */
 button.complete {
   color: #198754; /* green-ish */
 }
 
+/* Selector: button.delete (styles for this element/class/id) */
 button.delete {
   color: #d63333;
 }
 
+/* Selector: .btn.primary (styles for this element/class/id) */
 .btn.primary {
   display: inline-block;
   background: #4a5cff;
@@ -105,6 +121,7 @@ button.delete {
 }
 
 /* optional: make completed tasks slightly dimmer overall */
+/* Selector: .task-list li.completed (styles for this element/class/id) */
 .task-list li.completed {
   background: #eef2ff;
 <<<<<<< HEAD

@@ -1,4 +1,5 @@
 
+/* Selector: body (styles for this element/class/id) */
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #e2faff, #e0d8ff);
@@ -11,12 +12,14 @@ body {
   justify-content: center;
 }
 
+/* Selector: header (styles for this element/class/id) */
 header {
   position: absolute;
   top: 20px;
   left: 20px;
 }
 
+/* Selector: .timer-box (styles for this element/class/id) */
 .timer-box {
   background: #fff;
   padding: 40px;
@@ -24,11 +27,13 @@ header {
   box-shadow: 0 3px 10px rgba(0,0,0,0.2);
 }
 
+/* Selector: .display h1 (styles for this element/class/id) */
 .display h1 {
   font-size: 60px;
   margin-bottom: 10px;
 }
 
+/* Selector: .controls (styles for this element/class/id) */
 .controls {
   display: flex;
   justify-content: center;
@@ -36,6 +41,7 @@ header {
   margin: 20px 0;
 }
 
+/* Selector: .btn (styles for this element/class/id) */
 .btn {
   padding: 10px 18px;
   border-radius: 20px;
@@ -46,12 +52,14 @@ header {
   cursor: pointer;
 }
 
+/* Selector: .btn.ghost (styles for this element/class/id) */
 .btn.ghost {
   background: white;
   border: 2px solid #4a5cff;
   color: #4a5cff;
 }
 
+/* Selector: .btn.secondary (styles for this element/class/id) */
 .btn.secondary {
   display: block;
   margin: auto;

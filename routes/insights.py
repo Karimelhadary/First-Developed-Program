@@ -1,5 +1,5 @@
 
-
+# --- Imports used in this file (what we need from libraries/modules) ---
 from __future__ import annotations
 
 from collections import defaultdict
@@ -14,23 +14,40 @@ insights_bp = Blueprint("insights_bp", __name__)
 
 
 # Function: _col (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: _col
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _col(name: str):
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     # Supports both styles: current_app.db["x"] or current_app.x
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if hasattr(current_app, "db"):
-# MongoDB operation: read/write data in a collection
+        # MongoDB operation: read/write data in a collection
         return current_app.db[name]
     return getattr(current_app, name)
 
 
 # Function: _safe_int (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: _safe_int
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _safe_int(x, default=0):
+    # Control-flow: starts a 'try:' block (indentation shows what belongs to it).
     try:
         return int(x)
     except Exception:
         return default
 
 
+
+# -------------------------------
+# FUNCTION: _insights_payload
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _insights_payload(user_id: str) -> dict:
     tasks_col = _col("tasks")
     focus_col = _col("focus_sessions")
@@ -45,9 +62,9 @@ def _insights_payload(user_id: str) -> dict:
     progress_pct = int(round((completed / total) * 100)) if total > 0 else 0
 
     # -------- Timer sessions totals --------
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     focus_docs = list(focus_col.find({"user_id": user_id}))
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     break_docs = list(break_col.find({"user_id": user_id}))
 
     focus_minutes = sum(_safe_int(d.get("minutes", 0)) for d in focus_docs)
@@ -62,16 +79,25 @@ def _insights_payload(user_id: str) -> dict:
     labels = [d.strftime("%a") for d in days]
 
 # Function: sum_by_day (reads input, applies logic, returns response/value)
+
+    # -------------------------------
+    # FUNCTION: sum_by_day
+    # What happens here: inputs -> logic -> output/return
+    # -------------------------------
     def sum_by_day(docs):
         per = {d: 0 for d in days}
+        # Control-flow: starts a 'for' block (indentation shows what belongs to it).
         for doc in docs:
             dt = doc.get("created_at")
+            # Control-flow: starts a 'if' block (indentation shows what belongs to it).
             if not dt:
                 continue
+            # Control-flow: starts a 'try:' block (indentation shows what belongs to it).
             try:
                 day = dt.date()
             except Exception:
                 continue
+            # Control-flow: starts a 'if' block (indentation shows what belongs to it).
             if day in per:
                 per[day] += _safe_int(doc.get("minutes", 0))
         return [per[d] for d in days]
@@ -85,9 +111,11 @@ def _insights_payload(user_id: str) -> dict:
     unlinked_minutes = 0
     unlinked_sessions = 0
 
+    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for s in focus_docs:
         mins = _safe_int(s.get("minutes", 0))
         tid = s.get("task_id")
+        # Control-flow: starts a 'if' block (indentation shows what belongs to it).
         if tid:
             task_minutes[tid] += mins
             task_sessions[tid] += 1
@@ -97,10 +125,10 @@ def _insights_payload(user_id: str) -> dict:
 
     # Load task titles + project_id for those tasks
     task_ids = list(task_minutes.keys())
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     task_docs = list(tasks_col.find({"user_id": user_id, "_id": {"$in": [__import__("bson").ObjectId(t) for t in task_ids if _looks_like_objectid(t)]}})) if task_ids else []
     # If your focus_sessions stores task_id as string (not ObjectId), we also try string matching:
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     task_docs += list(tasks_col.find({"user_id": user_id, "_id": {"$in": []}}))  # no-op, keeps structure stable
 
     # Because your tasks model converts IDs to strings for templates, in Mongo _id is ObjectId.
@@ -108,11 +136,12 @@ def _insights_payload(user_id: str) -> dict:
     tasks_by_id = {str(d["_id"]): d for d in task_docs}
 
     # Projects map
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     projects = list(projects_col.find({"user_id": user_id}))
     project_name = {str(p["_id"]): p.get("name", "Untitled") for p in projects}
 
     top_tasks = []
+    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for tid, mins in sorted(task_minutes.items(), key=lambda x: x[1], reverse=True)[:8]:
         doc = tasks_by_id.get(tid)
         title = doc.get("title") if doc else "Deleted task"
@@ -129,9 +158,10 @@ def _insights_payload(user_id: str) -> dict:
 
     # -------- NEW: Project stats (so Projects feel real) --------
     project_stats = []
+    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for p in projects:
         pid = str(p["_id"])
-# MongoDB operation: read/write data in a collection
+        # MongoDB operation: read/write data in a collection
         p_tasks = list(tasks_col.find({"user_id": user_id, "project_id": pid}))
         p_total = len(p_tasks)
         p_done = sum(1 for t in p_tasks if t.get("completed") is True)
@@ -178,9 +208,16 @@ def _insights_payload(user_id: str) -> dict:
     }
 
 
+
+# -------------------------------
+# FUNCTION: _looks_like_objectid
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _looks_like_objectid(s: str) -> bool:
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not isinstance(s, str) or len(s) != 24:
         return False
+    # Control-flow: starts a 'try:' block (indentation shows what belongs to it).
     try:
         int(s, 16)
         return True
@@ -189,17 +226,31 @@ def _looks_like_objectid(s: str) -> bool:
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @insights_bp.route("/insights")
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: insights (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: insights
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def insights():
     return render_template("insights.html")
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @insights_bp.route("/api/insights")
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: insights_api (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: insights_api
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def insights_api():
     user_id = session.get("user_id")
     return jsonify(_insights_payload(user_id))

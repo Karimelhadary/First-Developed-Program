@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% set hide_nav = true %}
 {% block title %}TaskManager — Onboarding{% endblock %}
@@ -7,6 +8,7 @@
     <h1 class="tm-page-title h3 mb-1">How are you feeling today?</h1>
     <p class="tm-subtitle mb-4">Your mood helps us suggest tasks and choose a focus style that fits your energy.</p>
 
+    <!-- FORM: user input fields + submit buttons -->
     <form action="{{ url_for('onboarding_bp.onboarding') }}" method="post">
       <div class="row g-3">
         {% set moods = [

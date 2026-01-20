@@ -1,4 +1,5 @@
 
+# --- Imports used in this file (what we need from libraries/modules) ---
 import os
 from flask import Flask
 from pymongo import MongoClient
@@ -6,6 +7,11 @@ from pymongo import MongoClient
 
 
 # Function: create_app (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: create_app
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def create_app():
     app = Flask(__name__)
 
@@ -24,25 +30,34 @@ def create_app():
     app.db = client[db_name]
 
     # Collections
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.users = app.db["users"]
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.tasks = app.db["tasks"]
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.moods = app.db["moods"]
 
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.focus_sessions = app.db["focus_sessions"]
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.break_sessions = app.db["break_sessions"]
 
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.projects = app.db["projects"]
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.tags = app.db["tags"]
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.settings = app.db["settings"]
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
+    # MongoDB collection handle: this behaves like a table reference (used for CRUD).
     app.audit_logs = app.db["audit_logs"]
 
     # -----------------------
@@ -53,6 +68,7 @@ def create_app():
     # -----------------------
     #  Register Blueprints
     # -----------------------
+    # --- Imports used in this file (what we need from libraries/modules) ---
     from routes.dashboard import dashboard_bp
     from routes.login import login_bp
     from routes.onboarding import onboarding_bp
@@ -77,6 +93,7 @@ def create_app():
 
 
 # Entry point: this block runs only when you execute this file directly
+# Control-flow: starts a 'if' block (indentation shows what belongs to it).
 if __name__ == "__main__":
     app = create_app()
     debug = os.environ.get("FLASK_DEBUG", "1") == "1"

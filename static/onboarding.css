@@ -1,5 +1,6 @@
 
 /* RESET */
+/* Selector: * (styles for this element/class/id) */
 * {
   margin: 0;
   padding: 0;
@@ -7,6 +8,7 @@
 }
 
 /* PAGE BACKGROUND + BASE TYPOGRAPHY */
+/* Selector: body (styles for this element/class/id) */
 body {
   font-family: "Segoe UI", Tahoma, sans-serif;
   background: linear-gradient(120deg, #c4f5e8, #e0d6ff);
@@ -15,11 +17,13 @@ body {
 }
 
 /* hide the raw checkbox for theme toggle */
+/* Selector: .theme-toggle (styles for this element/class/id) */
 .theme-toggle {
   display: none;
 }
 
 /* APP WRAPPER */
+/* Selector: .app (styles for this element/class/id) */
 .app {
   max-width: 900px;
   margin: 0 auto;
@@ -29,6 +33,7 @@ body {
 }
 
 /* TOP BAR */
+/* Selector: .topbar (styles for this element/class/id) */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -36,12 +41,14 @@ body {
   padding: 20px 10px;
 }
 
+/* Selector: .topbar .back (styles for this element/class/id) */
 .topbar .back {
   text-decoration: none;
   color: #4a5cff;
   font-weight: 600;
 }
 
+/* Selector: .topbar .toggle (styles for this element/class/id) */
 .topbar .toggle {
   cursor: pointer;
   display: inline-flex;
@@ -51,6 +58,7 @@ body {
 }
 
 /* MAIN AREA */
+/* Selector: .wrap (styles for this element/class/id) */
 .wrap {
   flex: 1;
   display: flex;
@@ -60,6 +68,7 @@ body {
 }
 
 /* CARD */
+/* Selector: .card.panel (styles for this element/class/id) */
 .card.panel {
   background: #ffffff;
   width: 100%;
@@ -70,6 +79,7 @@ body {
 }
 
 /* HEADINGS & TEXT */
+/* Selector: .card.panel h1 (styles for this element/class/id) */
 .card.panel h1 {
   text-align: left;
   font-size: 28px;
@@ -77,12 +87,14 @@ body {
   margin-bottom: 6px;
 }
 
+/* Selector: .card.panel p.muted (styles for this element/class/id) */
 .card.panel p.muted {
   color: #666;
   margin-bottom: 24px;
 }
 
 /* MOODS GRID */
+/* Selector: .moods (styles for this element/class/id) */
 .moods {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -90,6 +102,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Selector: .mood (styles for this element/class/id) */
 .mood {
   background: #f2fdf9;
   border: 2px solid transparent;
@@ -105,43 +118,51 @@ body {
   align-items: center;
 }
 
+/* Selector: .mood span (styles for this element/class/id) */
 .mood span {
   pointer-events: none; /* so clicking text still hits the label */
 }
 
+/* Selector: .mood:hover (styles for this element/class/id) */
 .mood:hover {
   background: #d9faf0;
   transform: translateY(-1px);
 }
 
+/* Selector: .mood input (styles for this element/class/id) */
 .mood input {
   display: none;
 }
 
 /* when the radio is checked */
+/* Selector: .mood input:checked + span (styles for this element/class/id) */
 .mood input:checked + span {
   color: #5c45ff;
   font-weight: 700;
 }
 
 /* extra active styling from JS */
+/* Selector: .mood.active (styles for this element/class/id) */
 .mood.active {
   border-color: #5c45ff;
   background: #e7e0ff;
 }
 
 /* SELECTED MOOD TEXT */
+/* Selector: #mood-selected (styles for this element/class/id) */
 #mood-selected {
   font-size: 14px;
   color: #555;
 }
 
 /* ACTIONS (SKIP / CONTINUE) */
+/* Selector: .actions (styles for this element/class/id) */
 .actions {
   margin-top: 24px;
   text-align: right;
 }
 
+/* Selector: .btn (styles for this element/class/id) */
 .btn {
   display: inline-block;
   padding: 10px 20px;
@@ -154,21 +175,25 @@ body {
   transition: 0.2s;
 }
 
+/* Selector: .btn.primary (styles for this element/class/id) */
 .btn.primary {
   background: #5c45ff;
   color: #fff;
 }
 
+/* Selector: .btn.primary:hover (styles for this element/class/id) */
 .btn.primary:hover {
   background: #4328d6;
 }
 
+/* Selector: .btn.ghost (styles for this element/class/id) */
 .btn.ghost {
   border: 2px solid #5c45ff;
   color: #5c45ff;
   background: transparent;
 }
 
+/* Selector: .btn.ghost:hover (styles for this element/class/id) */
 .btn.ghost:hover {
   background: #5c45ff;
   color: #fff;
@@ -176,14 +201,17 @@ body {
 
 /* RESPONSIVE */
 @media (max-width: 600px) {
+/* Selector: .card.panel (styles for this element/class/id) */
   .card.panel {
     padding: 24px 18px;
   }
 
+/* Selector: .card.panel h1 (styles for this element/class/id) */
   .card.panel h1 {
     font-size: 22px;
   }
 
+/* Selector: .moods (styles for this element/class/id) */
   .moods {
     grid-template-columns: 1fr 1fr;
   }

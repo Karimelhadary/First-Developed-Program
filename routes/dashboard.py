@@ -1,4 +1,5 @@
 
+# --- Imports used in this file (what we need from libraries/modules) ---
 from __future__ import annotations
 
 from datetime import datetime, date
@@ -17,9 +18,16 @@ dashboard_bp = Blueprint("dashboard_bp", __name__)
 
 
 # Function: _parse_due (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: _parse_due
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _parse_due(due_str: str):
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not due_str:
         return None
+    # Control-flow: starts a 'try:' block (indentation shows what belongs to it).
     try:
         return datetime.strptime(due_str, "%Y-%m-%d").date()
     except Exception:
@@ -27,32 +35,55 @@ def _parse_due(due_str: str):
 
 
 # Function: _due_status (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: _due_status
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _due_status(d: date | None, today: date):
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not d:
         return "none", None
     delta = (d - today).days
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if delta < 0:
         return "overdue", delta
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if delta == 0:
         return "today", 0
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if 1 <= delta <= 3:
         return "soon", delta
     return "later", delta
 
 
 # Function: _importance_class (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: _importance_class
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def _importance_class(importance: str):
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if importance == "High":
         return "high"
+    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if importance == "Medium":
         return "med"
     return "low"
 
 
 # Flask decorator: attaches this function to a URL endpoint / request hook
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @dashboard_bp.route("/dashboard")
+# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
 # Function: dashboard (reads input, applies logic, returns response/value)
+
+# -------------------------------
+# FUNCTION: dashboard
+# What happens here: inputs -> logic -> output/return
+# -------------------------------
 def dashboard():
     user_id = session.get("user_id")
 
@@ -71,12 +102,14 @@ def dashboard():
     project_name = {p["id"]: p["name"] for p in projects}
 
     # focus aggregation per task
-# MongoDB operation: read/write data in a collection
+    # MongoDB operation: read/write data in a collection
     focus_docs = list(current_app.focus_sessions.find({"user_id": user_id}))
     focus_minutes_by_task = defaultdict(int)
     focus_sessions_by_task = defaultdict(int)
+    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for s in focus_docs:
         tid = s.get("task_id")
+        # Control-flow: starts a 'if' block (indentation shows what belongs to it).
         if tid:
             focus_minutes_by_task[tid] += int(s.get("minutes", 0) or 0)
             focus_sessions_by_task[tid] += 1
@@ -84,6 +117,7 @@ def dashboard():
     today = datetime.utcnow().date()
 
     enriched = []
+    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for t in tasks:
         due = _parse_due(t.get("due_date", ""))
         status, days_left = _due_status(due, today)

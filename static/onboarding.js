@@ -2,6 +2,7 @@
 // static/onboarding.js - mood selection interactions
 
 // Event listener: runs a function when the user triggers an event
+// Event listener: runs the callback when the event occurs
 document.addEventListener("DOMContentLoaded", function () {
   console.log("onboarding.js loaded");
 
@@ -11,6 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const selectedText = document.getElementById("mood-selected");
 
 // Function definition: reusable logic block
+
+  // -------------------------------
+  // Function block: read this as input -> processing -> output
+  // -------------------------------
   function updateSelectedText(value) {
     if (!selectedText) return;
     let label = "";
@@ -39,12 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!input) return;
 
     // initial active state
+    // Control-flow: starts a 'if' block
     if (input.checked) {
       label.classList.add("active");
       updateSelectedText(input.value);
     }
 
 // Event listener: runs a function when the user triggers an event
+    // Event listener: runs the callback when the event occurs
     label.addEventListener("click", () => {
       // clear all active
       moodLabels.forEach((l) => l.classList.remove("active"));

@@ -1,10 +1,12 @@
 
+/* Selector: * (styles for this element/class/id) */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Selector: body (styles for this element/class/id) */
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: linear-gradient(135deg, #d5d9ff, #b8e3ff);
@@ -14,6 +16,7 @@ body {
   min-height: 100vh;
 }
 
+/* Selector: header (styles for this element/class/id) */
 header {
   display: flex;
   justify-content: space-between;
@@ -21,6 +24,7 @@ header {
   padding: 15px 25px;
 }
 
+/* Selector: .brand (styles for this element/class/id) */
 .brand {
   font-size: 20px;
   font-weight: bold;
@@ -28,6 +32,7 @@ header {
   color: #692a2a;
 }
 
+/* Selector: main (styles for this element/class/id) */
 main {
   flex: 1;
   display: flex;
@@ -35,6 +40,7 @@ main {
   align-items: center;
 }
 
+/* Selector: .card (styles for this element/class/id) */
 .card {
   background: white;
   border-radius: 10px;
@@ -45,15 +51,18 @@ main {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
+/* Selector: .card h1 (styles for this element/class/id) */
 .card h1 {
   margin-bottom: 15px;
 }
 
+/* Selector: .card p (styles for this element/class/id) */
 .card p {
   color: #555;
   margin-bottom: 25px;
 }
 
+/* Selector: .btn (styles for this element/class/id) */
 .btn {
   display: inline-block;
   padding: 10px 18px;
@@ -64,25 +73,30 @@ main {
   transition: 0.2s;
 }
 
+/* Selector: .btn.primary (styles for this element/class/id) */
 .btn.primary {
   background: #4a5cff;
   color: white;
 }
 
+/* Selector: .btn.primary:hover (styles for this element/class/id) */
 .btn.primary:hover {
   background: #3c4ae6;
 }
 
+/* Selector: .btn.ghost (styles for this element/class/id) */
 .btn.ghost {
   border: 2px solid #478ba5;
   color: #4a5cff;
 }
 
+/* Selector: .btn.ghost:hover (styles for this element/class/id) */
 .btn.ghost:hover {
   background: #4a5cff;
   color: white;
 }
 
+/* Selector: footer (styles for this element/class/id) */
 footer {
   text-align: center;
   padding: 15px;
