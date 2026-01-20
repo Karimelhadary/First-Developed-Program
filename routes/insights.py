@@ -67,7 +67,15 @@ def _insights_payload(user_id: str) -> dict:
     days = [(today - timedelta(days=i)) for i in range(6, -1, -1)]
     labels = [d.strftime("%a") for d in days]  # Abbreviated day names like 'Mon', 'Tue'
 
+<<<<<<< HEAD
     # Nested function to sum minutes by day for a list of documents
+=======
+
+    # -------------------------------
+    # FUNCTION: sum_by_day
+    # What happens here: inputs -> logic -> output/return
+    # -------------------------------
+>>>>>>> b62dba90a2fc4aa64684578fecfab61ff77bc548
     def sum_by_day(docs):
         # Initialize dictionary with 0 for each day
         per = {d: 0 for d in days}
