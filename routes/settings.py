@@ -1,8 +1,13 @@
+
+
 from __future__ import annotations
 
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, current_app, flash
 from utils.auth import login_required
 
+
+
+# Blueprint groups related routes into a reusable module
 settings_bp = Blueprint("settings_bp", __name__)
 
 DEFAULTS = {
@@ -23,7 +28,9 @@ def _get_settings(user_id: str) -> dict:
     return out
 
 
+# Function: _save_settings (reads input, applies logic, returns response/value)
 def _save_settings(user_id: str, updates: dict):
+# MongoDB operation: read/write data in a collection
     current_app.settings.update_one(
         {"user_id": user_id},
         {"$set": {"user_id": user_id, **updates}},
@@ -31,8 +38,10 @@ def _save_settings(user_id: str, updates: dict):
     )
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @settings_bp.route("/settings", methods=["GET", "POST"])
 @login_required
+# Function: settings_page (reads input, applies logic, returns response/value)
 def settings_page():
     user_id = session["user_id"]
 
@@ -67,14 +76,18 @@ def settings_page():
     return render_template("settings.html", active="settings", settings=settings)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @settings_bp.route("/api/settings", methods=["GET"])
 @login_required
+# Function: api_get_settings (reads input, applies logic, returns response/value)
 def api_get_settings():
     return jsonify(_get_settings(session["user_id"]))
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @settings_bp.route("/api/settings", methods=["POST"])
 @login_required
+# Function: api_settings (reads input, applies logic, returns response/value)
 def api_settings():
     user_id = session["user_id"]
     data = request.get_json(silent=True) or {}

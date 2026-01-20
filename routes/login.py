@@ -1,4 +1,7 @@
+
 from flask import (
+
+
     Blueprint,
     render_template,
     redirect,
@@ -9,11 +12,14 @@ from flask import (
 
 from model.user_model import verify_user, create_user, find_user_by_email
 
+# Blueprint groups related routes into a reusable module
 login_bp = Blueprint("login_bp", __name__)
 
 
 # ---------- LOGIN ----------
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @login_bp.route("/login", methods=["GET", "POST"])
+# Function: login (reads input, applies logic, returns response/value)
 def login():
     error = None
     email_value = ""
@@ -36,7 +42,9 @@ def login():
 
 
 # ---------- REGISTER ----------
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @login_bp.route("/register", methods=["GET", "POST"])
+# Function: register (reads input, applies logic, returns response/value)
 def register():
     error = None
     name_value = ""
@@ -74,7 +82,9 @@ def register():
 
 
 # ---------- LOGOUT ----------
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @login_bp.route("/logout")
+# Function: logout (reads input, applies logic, returns response/value)
 def logout():
     session.clear()
     return redirect(url_for("login_bp.login"))

@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -6,6 +7,9 @@ from flask import Blueprint, render_template, request, jsonify, session, current
 from utils.auth import login_required
 from model.task_model import get_all_tasks_sorted
 
+
+
+# Blueprint groups related routes into a reusable module
 timer_break_bp = Blueprint("timer_break_bp", __name__)
 
 DEFAULT_SETTINGS = {
@@ -26,6 +30,7 @@ def _get_settings(user_id: str) -> dict:
     return out
 
 
+# Function: _serialize_sessions (reads input, applies logic, returns response/value)
 def _serialize_sessions(docs):
     out = []
     for s in docs:
@@ -37,8 +42,10 @@ def _serialize_sessions(docs):
     return out
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @timer_break_bp.route("/timer")
 @login_required
+# Function: timer_page (reads input, applies logic, returns response/value)
 def timer_page():
     user_id = session["user_id"]
     settings = _get_settings(user_id)
@@ -54,8 +61,10 @@ def timer_page():
     )
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @timer_break_bp.route("/break")
 @login_required
+# Function: break_page (reads input, applies logic, returns response/value)
 def break_page():
     user_id = session["user_id"]
     settings = _get_settings(user_id)
@@ -77,21 +86,26 @@ def break_page():
     )
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @timer_break_bp.route("/api/focus-sessions", methods=["GET"])
 @login_required
+# Function: get_focus_sessions (reads input, applies logic, returns response/value)
 def get_focus_sessions():
     user_id = session["user_id"]
     limit = request.args.get("limit", type=int)
     limit = 10 if not limit or limit <= 0 or limit > 100 else limit
 
     sessions = list(
+# MongoDB operation: read/write data in a collection
         current_app.focus_sessions.find({"user_id": user_id}).sort("created_at", -1).limit(limit)
     )
     return jsonify(_serialize_sessions(sessions))
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @timer_break_bp.route("/api/focus-sessions", methods=["POST"])
 @login_required
+# Function: log_focus_session (reads input, applies logic, returns response/value)
 def log_focus_session():
     user_id = session["user_id"]
     data = request.get_json(silent=True) or {}
@@ -105,6 +119,7 @@ def log_focus_session():
 
     task_id = data.get("task_id") or None
 
+# MongoDB operation: read/write data in a collection
     current_app.focus_sessions.insert_one(
         {
             "user_id": user_id,
@@ -116,21 +131,26 @@ def log_focus_session():
     return jsonify({"ok": True})
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @timer_break_bp.route("/api/break-sessions", methods=["GET"])
 @login_required
+# Function: get_break_sessions (reads input, applies logic, returns response/value)
 def get_break_sessions():
     user_id = session["user_id"]
     limit = request.args.get("limit", type=int)
     limit = 10 if not limit or limit <= 0 or limit > 100 else limit
 
     sessions = list(
+# MongoDB operation: read/write data in a collection
         current_app.break_sessions.find({"user_id": user_id}).sort("created_at", -1).limit(limit)
     )
     return jsonify(_serialize_sessions(sessions))
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @timer_break_bp.route("/api/break-sessions", methods=["POST"])
 @login_required
+# Function: log_break_session (reads input, applies logic, returns response/value)
 def log_break_session():
     user_id = session["user_id"]
     data = request.get_json(silent=True) or {}
@@ -146,6 +166,7 @@ def log_break_session():
     if mode not in ("break", "long_break"):
         mode = "break"
 
+# MongoDB operation: read/write data in a collection
     current_app.break_sessions.insert_one(
         {
             "user_id": user_id,

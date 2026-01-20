@@ -1,3 +1,5 @@
+
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -6,16 +8,22 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, session, jsonify, current_app
 from utils.auth import login_required
 
+
+# Blueprint groups related routes into a reusable module
 insights_bp = Blueprint("insights_bp", __name__)
 
 
+# Function: _col (reads input, applies logic, returns response/value)
 def _col(name: str):
+# MongoDB operation: read/write data in a collection
     # Supports both styles: current_app.db["x"] or current_app.x
     if hasattr(current_app, "db"):
+# MongoDB operation: read/write data in a collection
         return current_app.db[name]
     return getattr(current_app, name)
 
 
+# Function: _safe_int (reads input, applies logic, returns response/value)
 def _safe_int(x, default=0):
     try:
         return int(x)
@@ -37,7 +45,9 @@ def _insights_payload(user_id: str) -> dict:
     progress_pct = int(round((completed / total) * 100)) if total > 0 else 0
 
     # -------- Timer sessions totals --------
+# MongoDB operation: read/write data in a collection
     focus_docs = list(focus_col.find({"user_id": user_id}))
+# MongoDB operation: read/write data in a collection
     break_docs = list(break_col.find({"user_id": user_id}))
 
     focus_minutes = sum(_safe_int(d.get("minutes", 0)) for d in focus_docs)
@@ -51,6 +61,7 @@ def _insights_payload(user_id: str) -> dict:
     days = [(today - timedelta(days=i)) for i in range(6, -1, -1)]
     labels = [d.strftime("%a") for d in days]
 
+# Function: sum_by_day (reads input, applies logic, returns response/value)
     def sum_by_day(docs):
         per = {d: 0 for d in days}
         for doc in docs:
@@ -86,8 +97,10 @@ def _insights_payload(user_id: str) -> dict:
 
     # Load task titles + project_id for those tasks
     task_ids = list(task_minutes.keys())
+# MongoDB operation: read/write data in a collection
     task_docs = list(tasks_col.find({"user_id": user_id, "_id": {"$in": [__import__("bson").ObjectId(t) for t in task_ids if _looks_like_objectid(t)]}})) if task_ids else []
     # If your focus_sessions stores task_id as string (not ObjectId), we also try string matching:
+# MongoDB operation: read/write data in a collection
     task_docs += list(tasks_col.find({"user_id": user_id, "_id": {"$in": []}}))  # no-op, keeps structure stable
 
     # Because your tasks model converts IDs to strings for templates, in Mongo _id is ObjectId.
@@ -95,6 +108,7 @@ def _insights_payload(user_id: str) -> dict:
     tasks_by_id = {str(d["_id"]): d for d in task_docs}
 
     # Projects map
+# MongoDB operation: read/write data in a collection
     projects = list(projects_col.find({"user_id": user_id}))
     project_name = {str(p["_id"]): p.get("name", "Untitled") for p in projects}
 
@@ -117,6 +131,7 @@ def _insights_payload(user_id: str) -> dict:
     project_stats = []
     for p in projects:
         pid = str(p["_id"])
+# MongoDB operation: read/write data in a collection
         p_tasks = list(tasks_col.find({"user_id": user_id, "project_id": pid}))
         p_total = len(p_tasks)
         p_done = sum(1 for t in p_tasks if t.get("completed") is True)
@@ -173,14 +188,18 @@ def _looks_like_objectid(s: str) -> bool:
         return False
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @insights_bp.route("/insights")
 @login_required
+# Function: insights (reads input, applies logic, returns response/value)
 def insights():
     return render_template("insights.html")
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @insights_bp.route("/api/insights")
 @login_required
+# Function: insights_api (reads input, applies logic, returns response/value)
 def insights_api():
     user_id = session.get("user_id")
     return jsonify(_insights_payload(user_id))

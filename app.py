@@ -1,8 +1,11 @@
+
 import os
 from flask import Flask
 from pymongo import MongoClient
 
 
+
+# Function: create_app (reads input, applies logic, returns response/value)
 def create_app():
     app = Flask(__name__)
 
@@ -21,16 +24,25 @@ def create_app():
     app.db = client[db_name]
 
     # Collections
+# MongoDB operation: read/write data in a collection
     app.users = app.db["users"]
+# MongoDB operation: read/write data in a collection
     app.tasks = app.db["tasks"]
+# MongoDB operation: read/write data in a collection
     app.moods = app.db["moods"]
 
+# MongoDB operation: read/write data in a collection
     app.focus_sessions = app.db["focus_sessions"]
+# MongoDB operation: read/write data in a collection
     app.break_sessions = app.db["break_sessions"]
 
+# MongoDB operation: read/write data in a collection
     app.projects = app.db["projects"]
+# MongoDB operation: read/write data in a collection
     app.tags = app.db["tags"]
+# MongoDB operation: read/write data in a collection
     app.settings = app.db["settings"]
+# MongoDB operation: read/write data in a collection
     app.audit_logs = app.db["audit_logs"]
 
     # -----------------------
@@ -64,6 +76,7 @@ def create_app():
     return app
 
 
+# Entry point: this block runs only when you execute this file directly
 if __name__ == "__main__":
     app = create_app()
     debug = os.environ.get("FLASK_DEBUG", "1") == "1"

@@ -1,9 +1,13 @@
+
+
 import os
 import hashlib
 import binascii
 from flask import current_app
 
 # SALT length in bytes
+
+
 SALT_LEN = 16
 
 def hash_password(password: str) -> dict:

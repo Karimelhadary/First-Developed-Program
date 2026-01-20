@@ -1,3 +1,5 @@
+
+
 """Authentication helpers.
 
 This project uses a simple session-based login system.
@@ -12,10 +14,12 @@ from typing import Callable, Any
 from flask import session, redirect, url_for, request
 
 
+# Function: login_required (reads input, applies logic, returns response/value)
 def login_required(view_func: Callable[..., Any]):
     """Redirect to /login if the user is not logged in."""
 
     @wraps(view_func)
+# Function: wrapper (reads input, applies logic, returns response/value)
     def wrapper(*args, **kwargs):
         if not session.get("user_id"):
             # remember where user wanted to go

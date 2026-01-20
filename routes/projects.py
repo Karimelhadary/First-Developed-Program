@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -7,17 +8,24 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from utils.auth import login_required
 from model.project_model import list_projects, get_project, create_project, update_project, delete_project
 
+
+
+# Blueprint groups related routes into a reusable module
 projects_bp = Blueprint("projects_bp", __name__)
 
 
+# Function: _col (reads input, applies logic, returns response/value)
 def _col(name: str):
     if hasattr(current_app, "db"):
+# MongoDB operation: read/write data in a collection
         return current_app.db[name]
     return getattr(current_app, name)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @projects_bp.route("/projects")
 @login_required
+# Function: projects_list (reads input, applies logic, returns response/value)
 def projects_list():
     user_id = session.get("user_id")
     projects = list_projects(user_id)
@@ -26,6 +34,7 @@ def projects_list():
     focus_col = _col("focus_sessions")
 
     # focus per task id (for fast project rollups)
+# MongoDB operation: read/write data in a collection
     focus_docs = list(focus_col.find({"user_id": user_id}))
     task_focus = defaultdict(int)
     for s in focus_docs:
@@ -36,6 +45,7 @@ def projects_list():
     enriched = []
     for p in projects:
         pid = p["id"]
+# MongoDB operation: read/write data in a collection
         p_tasks = list(tasks_col.find({"user_id": user_id, "project_id": pid}))
         total = len(p_tasks)
         done = sum(1 for t in p_tasks if t.get("completed") is True)
@@ -54,8 +64,10 @@ def projects_list():
     return render_template("projects.html", projects=enriched)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @projects_bp.route("/projects/<project_id>")
 @login_required
+# Function: project_detail (reads input, applies logic, returns response/value)
 def project_detail(project_id: str):
     user_id = session.get("user_id")
     project = get_project(user_id, project_id)
@@ -65,9 +77,11 @@ def project_detail(project_id: str):
     tasks_col = _col("tasks")
     focus_col = _col("focus_sessions")
 
+# MongoDB operation: read/write data in a collection
     tasks = list(tasks_col.find({"user_id": user_id, "project_id": project_id}))
 
     # map focus minutes per task
+# MongoDB operation: read/write data in a collection
     focus_docs = list(focus_col.find({"user_id": user_id}))
     task_focus = defaultdict(int)
     task_sessions = defaultdict(int)
@@ -112,8 +126,10 @@ def project_detail(project_id: str):
     )
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @projects_bp.route("/projects/new", methods=["GET", "POST"])
 @login_required
+# Function: projects_new (reads input, applies logic, returns response/value)
 def projects_new():
     if request.method == "POST":
         user_id = session.get("user_id")
@@ -125,8 +141,10 @@ def projects_new():
     return render_template("project_form.html", editing=False)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @projects_bp.route("/projects/<project_id>/edit", methods=["GET", "POST"])
 @login_required
+# Function: projects_edit (reads input, applies logic, returns response/value)
 def projects_edit(project_id: str):
     user_id = session.get("user_id")
     project = get_project(user_id, project_id)
@@ -142,8 +160,10 @@ def projects_edit(project_id: str):
     return render_template("project_form.html", editing=True, project=project)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @projects_bp.route("/projects/<project_id>/delete", methods=["POST"])
 @login_required
+# Function: projects_delete (reads input, applies logic, returns response/value)
 def projects_delete(project_id: str):
     user_id = session.get("user_id")
     delete_project(user_id, project_id)

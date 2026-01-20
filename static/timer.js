@@ -1,16 +1,27 @@
+
 let intervalId = null;
 let remainingSeconds = 25 * 60;
 
+// DOM access: selecting HTML elements to read/update UI
 const display = document.getElementById("timerDisplay");
+// DOM access: selecting HTML elements to read/update UI
 const subtitle = document.getElementById("timerSubtitle");
+// DOM access: selecting HTML elements to read/update UI
 const startBtn = document.getElementById("startBtn");
+// DOM access: selecting HTML elements to read/update UI
 const pauseBtn = document.getElementById("pauseBtn");
+// DOM access: selecting HTML elements to read/update UI
 const resetBtn = document.getElementById("resetBtn");
+// DOM access: selecting HTML elements to read/update UI
 const modeSelect = document.getElementById("modeSelect");
+// DOM access: selecting HTML elements to read/update UI
 const minutesInput = document.getElementById("minutesInput");
+// DOM access: selecting HTML elements to read/update UI
 const taskSelect = document.getElementById("taskSelect");
+// DOM access: selecting HTML elements to read/update UI
 const configEl = document.getElementById("timerConfig");
 
+// Function definition: reusable logic block
 function readIntAttr(name, fallback) {
   if (!configEl) return fallback;
   const raw = configEl.getAttribute(name);
@@ -27,30 +38,35 @@ const SETTINGS = {
 
 const STORAGE_KEY = "tm_focusCount";
 
+// Function definition: reusable logic block
 function fmt(sec) {
   const m = Math.floor(sec / 60).toString().padStart(2, "0");
   const s = Math.floor(sec % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
 
+// Function definition: reusable logic block
 function clampInt(n, min, max, fallback) {
   const x = parseInt(n, 10);
   if (!Number.isFinite(x)) return fallback;
   return Math.max(min, Math.min(max, x));
 }
 
+// Function definition: reusable logic block
 function modeLabel(mode) {
   if (mode === "break") return "Short break";
   if (mode === "long_break") return "Long break";
   return "Focus session";
 }
 
+// Function definition: reusable logic block
 function modeDefaultMinutes(mode) {
   if (mode === "break") return SETTINGS.breakMinutes;
   if (mode === "long_break") return SETTINGS.longBreakMinutes;
   return SETTINGS.focusMinutes;
 }
 
+// Function definition: reusable logic block
 function syncFromInputs() {
   const mode = modeSelect?.value || "focus";
   const mins = clampInt(minutesInput?.value, 1, 180, modeDefaultMinutes(mode));
@@ -61,12 +77,14 @@ function syncFromInputs() {
   if (subtitle) subtitle.textContent = modeLabel(mode);
 }
 
+// Function definition: reusable logic block
 function getFocusCount() {
   const raw = localStorage.getItem(STORAGE_KEY);
   const n = parseInt(raw || "0", 10);
   return Number.isFinite(n) ? n : 0;
 }
 
+// Function definition: reusable logic block
 function setFocusCount(n) {
   localStorage.setItem(STORAGE_KEY, String(Math.max(0, n)));
 }
@@ -78,6 +96,7 @@ async function logSession(mode, minutes, taskId) {
   if (mode !== "focus") payload.mode = mode;
 
   try {
+// Network request: fetch() calls an API endpoint and returns a Promise
     await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -88,11 +107,13 @@ async function logSession(mode, minutes, taskId) {
   }
 }
 
+// Function definition: reusable logic block
 function setRunningUi(isRunning) {
   if (startBtn) startBtn.disabled = isRunning;
   if (pauseBtn) pauseBtn.disabled = !isRunning;
 }
 
+// Function definition: reusable logic block
 function start() {
   if (intervalId) return;
   syncFromInputs();
@@ -128,6 +149,7 @@ function start() {
   }, 1000);
 }
 
+// Function definition: reusable logic block
 function pause() {
   if (!intervalId) return;
   clearInterval(intervalId);
@@ -135,21 +157,27 @@ function pause() {
   setRunningUi(false);
 }
 
+// Function definition: reusable logic block
 function reset() {
   pause();
   syncFromInputs();
 }
 
+// Event listener: runs a function when the user triggers an event
 modeSelect?.addEventListener("change", () => {
   const mode = modeSelect.value;
   minutesInput.value = modeDefaultMinutes(mode);
   syncFromInputs();
 });
 
+// Event listener: runs a function when the user triggers an event
 minutesInput?.addEventListener("change", syncFromInputs);
 
+// Event listener: runs a function when the user triggers an event
 startBtn?.addEventListener("click", start);
+// Event listener: runs a function when the user triggers an event
 pauseBtn?.addEventListener("click", pause);
+// Event listener: runs a function when the user triggers an event
 resetBtn?.addEventListener("click", reset);
 
 syncFromInputs();

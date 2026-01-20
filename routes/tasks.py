@@ -1,9 +1,13 @@
+
+
 from flask import Blueprint, render_template, request, redirect, url_for, abort, session
 
 from utils.auth import login_required
 from model.project_model import list_projects
 from model.tag_model import list_tags, ensure_tags_exist
 from model.task_model import (
+
+
     get_all_tasks_sorted,
     get_task_by_id,
     insert_task,
@@ -12,11 +16,14 @@ from model.task_model import (
     toggle_task_complete,
 )
 
+# Blueprint groups related routes into a reusable module
 tasks_bp = Blueprint("tasks_bp", __name__)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @tasks_bp.route("/tasklist")
 @login_required
+# Function: task_list (reads input, applies logic, returns response/value)
 def task_list():
     sort_param = request.args.get("sort", "due_date")
     project_id = request.args.get("project") or ""
@@ -42,8 +49,10 @@ def task_list():
     )
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @tasks_bp.route("/addtask", methods=["GET", "POST"])
 @login_required
+# Function: add_task (reads input, applies logic, returns response/value)
 def add_task():
     user_id = session.get("user_id")
 
@@ -72,8 +81,10 @@ def add_task():
     return render_template("addtask.html", editing=False, projects=projects, tags=tags)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @tasks_bp.route("/tasks/<task_id>/edit", methods=["GET", "POST"])
 @login_required
+# Function: edit_task (reads input, applies logic, returns response/value)
 def edit_task(task_id):
     user_id = session.get("user_id")
     task = get_task_by_id(user_id, task_id)
@@ -101,8 +112,10 @@ def edit_task(task_id):
     return render_template("addtask.html", task=task, editing=True, projects=projects, tags=tags)
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @tasks_bp.route("/tasks/<task_id>/delete", methods=["POST"])
 @login_required
+# Function: delete_task_route (reads input, applies logic, returns response/value)
 def delete_task_route(task_id):
     user_id = session.get("user_id")
     delete_task(user_id, task_id)
@@ -112,8 +125,10 @@ def delete_task_route(task_id):
     return redirect(url_for("tasks_bp.task_list", sort=sort_param, project=project_id))
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @tasks_bp.route("/tasks/<task_id>/toggle_complete", methods=["POST"])
 @login_required
+# Function: toggle_complete (reads input, applies logic, returns response/value)
 def toggle_complete(task_id):
     user_id = session.get("user_id")
     toggle_task_complete(user_id, task_id)

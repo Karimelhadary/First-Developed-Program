@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from datetime import datetime, date
@@ -9,9 +10,13 @@ from model.task_model import get_tasks_for_dashboard
 from model.project_model import list_projects
 from utils.auth import login_required
 
+
+
+# Blueprint groups related routes into a reusable module
 dashboard_bp = Blueprint("dashboard_bp", __name__)
 
 
+# Function: _parse_due (reads input, applies logic, returns response/value)
 def _parse_due(due_str: str):
     if not due_str:
         return None
@@ -21,6 +26,7 @@ def _parse_due(due_str: str):
         return None
 
 
+# Function: _due_status (reads input, applies logic, returns response/value)
 def _due_status(d: date | None, today: date):
     if not d:
         return "none", None
@@ -34,6 +40,7 @@ def _due_status(d: date | None, today: date):
     return "later", delta
 
 
+# Function: _importance_class (reads input, applies logic, returns response/value)
 def _importance_class(importance: str):
     if importance == "High":
         return "high"
@@ -42,8 +49,10 @@ def _importance_class(importance: str):
     return "low"
 
 
+# Flask decorator: attaches this function to a URL endpoint / request hook
 @dashboard_bp.route("/dashboard")
 @login_required
+# Function: dashboard (reads input, applies logic, returns response/value)
 def dashboard():
     user_id = session.get("user_id")
 
@@ -62,6 +71,7 @@ def dashboard():
     project_name = {p["id"]: p["name"] for p in projects}
 
     # focus aggregation per task
+# MongoDB operation: read/write data in a collection
     focus_docs = list(current_app.focus_sessions.find({"user_id": user_id}))
     focus_minutes_by_task = defaultdict(int)
     focus_sessions_by_task = defaultdict(int)

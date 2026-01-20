@@ -1,8 +1,10 @@
+
 // static/main.js - site-wide behaviors: theme toggle and small helpers
 (function () {
   // -------------------------------
   // THEME HANDLING (light / dark)
   // -------------------------------
+// Function definition: reusable logic block
   function applyTheme(theme, checkbox) {
     if (theme === "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
@@ -17,10 +19,12 @@
     }
   }
 
+// Event listener: runs a function when the user triggers an event
   document.addEventListener("DOMContentLoaded", function () {
     console.log("main.js loaded");
 
     // ----- Theme toggle -----
+// DOM access: selecting HTML elements to read/update UI
     const toggle = document.getElementById("theme-toggle");
     const saved = localStorage.getItem("theme");
 
@@ -34,6 +38,7 @@
     }
 
     if (toggle) {
+// Event listener: runs a function when the user triggers an event
       toggle.addEventListener("change", function () {
         applyTheme(this.checked ? "dark" : "light", toggle);
       });
@@ -42,9 +47,11 @@
     // -------------------------------
     // DASHBOARD MOOD CHIPS
     // -------------------------------
+// DOM access: selecting HTML elements to read/update UI
     const chips = document.querySelectorAll(".mood-bar .chip");
     if (chips.length) {
       chips.forEach((chip) => {
+// Event listener: runs a function when the user triggers an event
         chip.addEventListener("click", function () {
           chips.forEach((c) => c.classList.remove("active"));
           this.classList.add("active");

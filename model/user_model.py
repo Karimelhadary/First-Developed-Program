@@ -1,7 +1,11 @@
+
 from flask import current_app
 from utils.security import hash_password, verify_password
 
 
+
+
+# Function: create_user (reads input, applies logic, returns response/value)
 def create_user(name: str, email: str, password: str):
     """
     Insert a new user with salted+peppered hash.
@@ -17,10 +21,12 @@ def create_user(name: str, email: str, password: str):
         "salt": hashed["salt"],
     }
 
+# MongoDB operation: read/write data in a collection
     result = current_app.users.insert_one(user)
     user_id = str(result.inserted_id)
 
     # Create default settings for this user (pomodoro defaults)
+# MongoDB operation: read/write data in a collection
     current_app.settings.update_one(
         {"user_id": user_id},
         {
@@ -36,6 +42,7 @@ def create_user(name: str, email: str, password: str):
     )
 
     # Create a "Personal" project so tasks can be grouped immediately
+# MongoDB operation: read/write data in a collection
     current_app.projects.update_one(
         {"user_id": user_id, "name": "Personal"},
         {
@@ -51,6 +58,7 @@ def create_user(name: str, email: str, password: str):
     return user_id
 
 
+# Function: find_user_by_email (reads input, applies logic, returns response/value)
 def find_user_by_email(email: str):
     email = email.lower().strip()
     return current_app.users.find_one({"email": email})
