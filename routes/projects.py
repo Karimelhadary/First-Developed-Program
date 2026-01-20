@@ -1,126 +1,117 @@
-
-# --- Imports used in this file (what we need from libraries/modules) ---
+# Enable future annotations for better type hinting
 from __future__ import annotations
 
+# Import defaultdict for default dictionaries
 from collections import defaultdict
 
+# Import Flask components: Blueprint for routes, render_template for HTML, request for form data, redirect for redirects, url_for for URLs, session for user data, abort for 404 errors, current_app for app context
 from flask import Blueprint, render_template, request, redirect, url_for, session, abort, current_app
 
+# Import login_required decorator
 from utils.auth import login_required
+# Import project model functions for CRUD operations
 from model.project_model import list_projects, get_project, create_project, update_project, delete_project
 
 
 
-# Blueprint groups related routes into a reusable module
+# Create Blueprint for project-related routes
 projects_bp = Blueprint("projects_bp", __name__)
 
 
-# Function: _col (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: _col
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
+# Helper function to get a MongoDB collection by name, supporting different app configurations
 def _col(name: str):
-    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
+    # Check if app has a 'db' attribute (alternative MongoDB setup)
     if hasattr(current_app, "db"):
-        # MongoDB operation: read/write data in a collection
+        # Access collection via current_app.db[name]
         return current_app.db[name]
+    # Otherwise, access as attribute of current_app (e.g., current_app.tasks)
     return getattr(current_app, name)
 
 
-# Flask decorator: attaches this function to a URL endpoint / request hook
-# Decorator: modifies the function below (commonly registers a route in Flask)
+# Route to list all projects for the user
 @projects_bp.route("/projects")
-# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
-# Function: projects_list (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: projects_list
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
 def projects_list():
+    # Get user ID from session
     user_id = session.get("user_id")
+    # Fetch user's projects
     projects = list_projects(user_id)
 
+    # Get database collections
     tasks_col = _col("tasks")
     focus_col = _col("focus_sessions")
 
-    # focus per task id (for fast project rollups)
-    # MongoDB operation: read/write data in a collection
+    # Fetch all focus sessions for the user
     focus_docs = list(focus_col.find({"user_id": user_id}))
+    # Create defaultdict to accumulate focus minutes per task
     task_focus = defaultdict(int)
-    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
+    # Loop through focus sessions and sum minutes per task
     for s in focus_docs:
         tid = s.get("task_id")
-        # Control-flow: starts a 'if' block (indentation shows what belongs to it).
         if tid:
             task_focus[tid] += int(s.get("minutes", 0) or 0)
 
+    # Enrich projects with statistics
     enriched = []
-    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for p in projects:
         pid = p["id"]
-        # MongoDB operation: read/write data in a collection
+        # Get tasks for this project
         p_tasks = list(tasks_col.find({"user_id": user_id, "project_id": pid}))
         total = len(p_tasks)
+        # Count completed tasks
         done = sum(1 for t in p_tasks if t.get("completed") is True)
-        # sum focus minutes for tasks in this project
+        # Sum focus minutes for tasks in this project
         focus_minutes = sum(task_focus.get(str(t["_id"]), 0) for t in p_tasks)
+        # Append enriched project data
         enriched.append(
             {
-                **p,
+                **p,  # Spread original project data
                 "tasks_total": total,
                 "tasks_done": done,
                 "focus_minutes": focus_minutes,
             }
         )
 
+    # Sort projects by focus minutes descending
     enriched.sort(key=lambda x: x["focus_minutes"], reverse=True)
+    # Render projects list template
     return render_template("projects.html", projects=enriched)
 
 
-# Flask decorator: attaches this function to a URL endpoint / request hook
-# Decorator: modifies the function below (commonly registers a route in Flask)
+# Route to show details of a specific project
 @projects_bp.route("/projects/<project_id>")
-# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
-# Function: project_detail (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: project_detail
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
 def project_detail(project_id: str):
+    # Get user ID
     user_id = session.get("user_id")
+    # Fetch project by ID
     project = get_project(user_id, project_id)
-    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
+    # If project not found, return 404
     if not project:
         abort(404)
 
+    # Get collections
     tasks_col = _col("tasks")
     focus_col = _col("focus_sessions")
 
-    # MongoDB operation: read/write data in a collection
+    # Fetch tasks for this project
     tasks = list(tasks_col.find({"user_id": user_id, "project_id": project_id}))
 
-    # map focus minutes per task
-    # MongoDB operation: read/write data in a collection
+    # Fetch focus sessions and aggregate per task
     focus_docs = list(focus_col.find({"user_id": user_id}))
     task_focus = defaultdict(int)
     task_sessions = defaultdict(int)
 
-    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
+    # Loop through focus sessions
     for s in focus_docs:
         tid = s.get("task_id")
-        # Control-flow: starts a 'if' block (indentation shows what belongs to it).
         if tid:
+            # Accumulate minutes and session count
             task_focus[tid] += int(s.get("minutes", 0) or 0)
             task_sessions[tid] += 1
 
+    # Prepare tasks for view
     view_tasks = []
-    # Control-flow: starts a 'for' block (indentation shows what belongs to it).
     for t in tasks:
         tid = str(t["_id"])
         view_tasks.append(
@@ -136,12 +127,15 @@ def project_detail(project_id: str):
             }
         )
 
+    # Sort tasks: completed first, then by due date
     view_tasks.sort(key=lambda x: (x["completed"], x["due_date"]))
 
+    # Calculate project stats
     total = len(view_tasks)
     done = sum(1 for t in view_tasks if t["completed"])
     focus_total = sum(t["focus_minutes"] for t in view_tasks)
 
+    # Render project detail template
     return render_template(
         "project_detail.html",
         project=project,
@@ -154,71 +148,51 @@ def project_detail(project_id: str):
     )
 
 
-# Flask decorator: attaches this function to a URL endpoint / request hook
-# Decorator: modifies the function below (commonly registers a route in Flask)
+# Route to create a new project
 @projects_bp.route("/projects/new", methods=["GET", "POST"])
-# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
-# Function: projects_new (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: projects_new
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
 def projects_new():
-    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
+    # Handle POST request (form submission)
     if request.method == "POST":
         user_id = session.get("user_id")
         name = request.form.get("name", "").strip()
-        # Control-flow: starts a 'if' block (indentation shows what belongs to it).
+        # If name provided, create project
         if name:
             create_project(user_id, name)
+        # Redirect to projects list
         return redirect(url_for("projects_bp.projects_list"))
 
+    # Render new project form
     return render_template("project_form.html", editing=False)
 
 
-# Flask decorator: attaches this function to a URL endpoint / request hook
-# Decorator: modifies the function below (commonly registers a route in Flask)
+# Route to edit an existing project
 @projects_bp.route("/projects/<project_id>/edit", methods=["GET", "POST"])
-# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
-# Function: projects_edit (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: projects_edit
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
 def projects_edit(project_id: str):
     user_id = session.get("user_id")
+    # Fetch project
     project = get_project(user_id, project_id)
-    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not project:
         abort(404)
 
-    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
+    # Handle POST
     if request.method == "POST":
         name = request.form.get("name", "").strip()
-        # Control-flow: starts a 'if' block (indentation shows what belongs to it).
         if name:
             update_project(user_id, project_id, name)
         return redirect(url_for("projects_bp.projects_list"))
 
+    # Render edit form
     return render_template("project_form.html", editing=True, project=project)
 
 
-# Flask decorator: attaches this function to a URL endpoint / request hook
-# Decorator: modifies the function below (commonly registers a route in Flask)
+# Route to delete a project
 @projects_bp.route("/projects/<project_id>/delete", methods=["POST"])
-# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
-# Function: projects_delete (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: projects_delete
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
 def projects_delete(project_id: str):
     user_id = session.get("user_id")
+    # Delete project
     delete_project(user_id, project_id)
+    # Redirect to projects list
     return redirect(url_for("projects_bp.projects_list"))

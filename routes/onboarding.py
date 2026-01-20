@@ -1,45 +1,41 @@
 
-
-# --- Imports used in this file (what we need from libraries/modules) ---
+# Unused import (likely a mistake, 'If' is not used in this file)
+from ast import If
+# Import Flask components: Blueprint for routes, render_template for HTML, request for form data, redirect for redirects, url_for for URLs, current_app for app context, session for user data
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, session
+# Import datetime for timestamping mood logs
 from datetime import datetime
+# Import login_required to protect the route
 from utils.auth import login_required
 
 
-# Blueprint groups related routes into a reusable module
+# Create Blueprint for onboarding routes
 onboarding_bp = Blueprint("onboarding_bp", __name__)
 
 
-# Flask decorator: attaches this function to a URL endpoint / request hook
-# Decorator: modifies the function below (commonly registers a route in Flask)
+# Route for onboarding page, handles GET (show form) and POST (process mood selection)
 @onboarding_bp.route("/onboarding", methods=["GET", "POST"])
-# Decorator: modifies the function below (commonly registers a route in Flask)
 @login_required
-# Function: onboarding (reads input, applies logic, returns response/value)
-
-# -------------------------------
-# FUNCTION: onboarding
-# What happens here: inputs -> logic -> output/return
-# -------------------------------
 def onboarding():
-    # Control-flow: starts a 'if' block (indentation shows what belongs to it).
+    # Check if request is POST (form submission)
     if request.method == "POST":
+        # Get mood from form, default to "focused" if missing
         mood = request.form.get("mood", "focused")
 
-        # Save mood into MongoDB
-        # MongoDB operation: read/write data in a collection
+        # Insert mood log into MongoDB moods collection
         current_app.moods.insert_one(
             {
-                "user_id": session.get("user_id"),
-                "mood": mood,
-                "created_at": datetime.utcnow(),
+                "user_id": session.get("user_id"),  # Associate with current user
+                "mood": mood,  # The selected mood
+                "created_at": datetime.utcnow(),  # Timestamp in UTC
             }
         )
 
-        # Also store in session so we can reuse it on dashboard if we want
+        # Store mood in session for later use (e.g., on dashboard)
         session["current_mood"] = mood
 
+        # Redirect to dashboard after saving
         return redirect(url_for("dashboard_bp.dashboard"))
 
-    # GET request -> show the form
+    # For GET request, render the onboarding form
     return render_template("onboarding.html")
