@@ -26,7 +26,9 @@ def ensure_tags_exist(user_id: str, tag_names: list[str]):
         # Control-flow: starts a 'if' block (indentation shows what belongs to it).
         if not name:
             continue
-        # MongoDB operation: read/write data in a collection
+        # “Look for a tag with this user_id and this name.
+        #If it exists → do nothing.
+        #If it does NOT exist → create it.”
         current_app.tags.update_one(
             {"user_id": user_id, "name": name},
             {"$setOnInsert": {"user_id": user_id, "name": name, "created_at": datetime.utcnow()}},
@@ -38,9 +40,10 @@ def ensure_tags_exist(user_id: str, tag_names: list[str]):
 
 # -------------------------------
 # FUNCTION: list_tags
-# What happens here: inputs -> logic -> output/return
+#This function returns the user’s tags sorted alphabetically as a simple list of names.
 # -------------------------------
 def list_tags(user_id: str):
-    # MongoDB operation: read/write data in a collection
+    # “From the tags collection, get all documents where user_id is this user, and sort them by name A → Z.”
     docs = list(current_app.tags.find({"user_id": user_id}).sort("name", 1))
+    #“From each tag document, take only the name field and return a list of strings.”
     return [d.get("name", "") for d in docs]

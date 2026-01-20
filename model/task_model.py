@@ -48,9 +48,12 @@ def _mongo_to_task(doc):
 
 # Function: _audit (reads input, applies logic, returns response/value)
 
-# -------------------------------
-# FUNCTION: _audit
-# What happens here: inputs -> logic -> output/return
+# -------------------------------{
+#  "user_id": user_id,
+# "action": "CREATE_TASK" or "UPDATE_TASK" or ...
+#  "created_at": current time,
+#  "payload": extra info (task id, changed fields, etc)
+
 # -------------------------------
 def _audit(user_id: str, action: str, payload: dict):
     # Control-flow: starts a 'try:' block (indentation shows what belongs to it).
@@ -70,7 +73,7 @@ importance_rank = {"Low": 1, "Medium": 2, "High": 3}
 
 # -------------------------------
 # FUNCTION: get_all_tasks_sorted
-# What happens here: inputs -> logic -> output/return
+# “This code builds a database query that selects only the current user’s tasks and optionally filters them by a selected project.”
 # -------------------------------
 def get_all_tasks_sorted(user_id: str, sort_param: str, project_id: str | None = None):
     query = {"user_id": user_id}
@@ -143,7 +146,7 @@ def get_task_by_id(user_id: str, task_id: str):
 
 # -------------------------------
 # FUNCTION: insert_task
-# What happens here: inputs -> logic -> output/return
+# “**task_data copies all key-value from the task dictionary into a new dictionary and adds the user_id field before saving it.”
 # -------------------------------
 def insert_task(user_id: str, task_data: dict):
     task_data = {**task_data, "user_id": user_id}
@@ -156,14 +159,15 @@ def insert_task(user_id: str, task_data: dict):
 
 # -------------------------------
 # FUNCTION: update_task
-# What happens here: inputs -> logic -> output/return
+#“This function safely updates a task in the database, ensures it belongs to the user, 
+# logs the update, and returns whether the update was successful.”
 # -------------------------------
 def update_task(user_id: str, task_id: str, updates: dict) -> bool:
     oid = _safe_object_id(task_id)
     # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if not oid:
         return False
-    # MongoDB operation: read/write data in a collection
+    # “Find the task with this ID that belongs to this user, and replace only these fields with new values.”
     result = current_app.tasks.update_one({"_id": oid, "user_id": user_id}, {"$set": updates})
     # Control-flow: starts a 'if' block (indentation shows what belongs to it).
     if result.modified_count > 0:
@@ -171,7 +175,10 @@ def update_task(user_id: str, task_id: str, updates: dict) -> bool:
         return True
     return False
 
-
+#You convert string → Mongo ObjectId when:
+#you want to search / update / delete something in MongoDB
+#You convert Mongo ObjectId → string when:
+#you want to send data to templates, JSON, or URLs
 
 # -------------------------------
 # FUNCTION: delete_task
@@ -209,7 +216,9 @@ def toggle_task_complete(user_id: str, task_id: str):
         return False
 
     new_value = not doc.get("completed", False)
-    # MongoDB operation: read/write data in a collection
+    # Take current value and flip it:
+    # If it was False → becomes True
+    # If it was True → becomes False
     current_app.tasks.update_one({"_id": oid, "user_id": user_id}, {"$set": {"completed": new_value}})
     _audit(user_id, "TOGGLE_TASK", {"task_id": task_id, "completed": new_value})
     return new_value

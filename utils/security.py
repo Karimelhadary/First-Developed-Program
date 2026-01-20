@@ -13,7 +13,7 @@ SALT_LEN = 16
 
 # -------------------------------
 # FUNCTION: hash_password
-# What happens here: inputs -> logic -> output/return
+# What happens here:It locks passwords when saving them and checks them safely when logging in.
 # -------------------------------
 def hash_password(password: str) -> dict:
     """
@@ -37,12 +37,14 @@ def hash_password(password: str) -> dict:
         "salt": binascii.hexlify(salt).decode(),
         "hash": binascii.hexlify(hashed).decode()
     }
-
+#MongoDB / JSON / Python dicts are much easier and safer to store as strings
+#It converts binary data → hex string
 
 
 # -------------------------------
 # FUNCTION: verify_password
-# What happens here: inputs -> logic -> output/return
+# What happens here:The app hashes passwords using SHA-256 with a per-user 
+# salt and an app-wide pepper and verifies them by re-hashing the entered password and comparing the result
 # -------------------------------
 def verify_password(password: str, salt_hex: str, stored_hash: str) -> bool:
     """
