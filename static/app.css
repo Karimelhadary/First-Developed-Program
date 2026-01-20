@@ -1,50 +1,68 @@
 
-/* Selector: :root (styles for this element/class/id) */
+/* This is static/app.css - main stylesheet for the TaskManager application */
+/* Defines CSS custom properties (variables) for colors and layout */
+
+/* :root selector defines global CSS variables */
 :root{
+  /* Background gradient start color */
   --tm-bg-start:#c9f3ef;
+  /* Background gradient end color */
   --tm-bg-end:#d5d9ff;
+  /* Border radius for cards */
   --tm-card-radius:18px;
 
-  /* semantic colors (light theme) */
-  --tm-danger:#dc3545;
-  --tm-warn:#ffc107;
-  --tm-info:#0dcaf0;
-  --tm-muted:#6c757d;
-  --tm-success:#198754;
-  --tm-dark:#212529;
+  /* Semantic colors for light theme */
+  --tm-danger:#dc3545; /* Red for errors/danger */
+  --tm-warn:#ffc107; /* Yellow for warnings */
+  --tm-info:#0dcaf0; /* Cyan for info */
+  --tm-muted:#6c757d; /* Gray for muted text */
+  --tm-success:#198754; /* Green for success */
+  --tm-dark:#212529; /* Dark color for text */
 }
 
-/* Selector: .app-body (styles for this element/class/id) */
+/* .app-body class styles the main body element */
 .app-body{
+  /* Minimum height of viewport */
   min-height:100vh;
+  /* Radial and linear gradient background */
   background: radial-gradient(1200px 700px at 15% 10%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 55%),
               linear-gradient(135deg, var(--tm-bg-start) 0%, var(--tm-bg-end) 100%);
 }
 
-/* Selector: [data-bs-theme="dark"] (styles for this element/class/id) */
+/* Dark theme overrides for data-bs-theme="dark" */
 [data-bs-theme="dark"]{
+  /* Adjusted danger color for dark theme */
   --tm-danger:#ff5a6a;
+  /* Adjusted warn color */
   --tm-warn:#ffd25a;
+  /* Adjusted info color */
   --tm-info:#6be7ff;
+  /* Adjusted muted color */
   --tm-muted:#9aa4b2;
+  /* Adjusted success color */
   --tm-success:#59d98e;
+  /* Adjusted dark color */
   --tm-dark:#e9ecef;
 }
 
-/* Selector: [data-bs-theme="dark"] .app-body (styles for this element/class/id) */
+/* Dark theme body background */
 [data-bs-theme="dark"] .app-body{
+  /* Darker radial and linear gradients */
   background: radial-gradient(1100px 650px at 15% 10%, rgba(255,255,255,.08) 0%, rgba(255,255,255,0) 55%),
               linear-gradient(135deg, #0b1220 0%, #101a2f 100%);
 }
 
-/* Selector: .tm-page-title (styles for this element/class/id) */
+/* Page title styling */
 .tm-page-title{
+  /* Bold font weight */
   font-weight: 700;
+  /* Slight letter spacing adjustment */
   letter-spacing: -.02em;
 }
 
-/* Selector: .tm-subtitle (styles for this element/class/id) */
+/* Subtitle styling */
 .tm-subtitle{
+  /* Semi-transparent dark color */
   color: rgba(33,37,41,.72);
 }
 

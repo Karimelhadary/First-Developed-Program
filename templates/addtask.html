@@ -1,25 +1,35 @@
-
+<!-- addtask.html - Template for adding or editing a task, extends base.html -->
+<!-- Sets the active navigation to 'tasks' and dynamic title based on editing mode -->
 {% extends "base.html" %}
 {% set active='tasks' %}
 {% block title %}TaskManager — {% if editing %}Edit Task{% else %}Add Task{% endif %}{% endblock %}
 {% block content %}
+<!-- Main container for the form card -->
 <div class="tm-form-card">
+  <!-- Header section with title, subtitle, and back link -->
   <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
     <div>
+      <!-- Dynamic title based on whether editing or adding -->
       <h1 class="tm-page-title h3 mb-1">{% if editing %}Edit Task{% else %}Add New Task{% endif %}</h1>
+      <!-- Dynamic subtitle -->
       <div class="tm-subtitle">{% if editing %}Update details and save.{% else %}Create a task you can actually finish.{% endif %}</div>
     </div>
+    <!-- Link back to task list -->
     <a class="tm-muted-link" href="{{ url_for('tasks_bp.task_list') }}">← Back to tasks</a>
   </div>
 
+  <!-- Card containing the form -->
   <div class="tm-card card p-4">
-    <!-- FORM: user input fields + submit buttons -->
+    <!-- Form for task input, uses POST method -->
     <form method="post">
+      <!-- Row for form fields with Bootstrap grid -->
       <div class="row g-3">
+        <!-- Project selection field -->
         <div class="col-12 col-md-6">
           <label class="form-label">Project <span class="opacity-75">(optional)</span></label>
           <select class="form-select" name="project_id">
             <option value="">No project assigned</option>
+            <!-- Loop through available projects -->
             {% for p in projects %}
               <option value="{{ p.id }}"
                 {% if editing and task.project_id == p.id %}selected{% endif %}>
@@ -30,6 +40,7 @@
           <div class="form-text">Projects help you group tasks. You can manage projects in the Projects page.</div>
         </div>
 
+        <!-- Tags input field -->
         <div class="col-12 col-md-6">
           <label class="form-label">Tags <span class="opacity-75">(comma separated)</span></label>
           <input class="form-control" type="text" name="tags"
@@ -38,6 +49,7 @@
           <div class="form-text">Suggestions: {{ tags|join(', ') }}</div>
         </div>
 
+        <!-- Title input field -->
         <div class="col-12">
           <label class="form-label">Title</label>
           <input class="form-control" type="text" name="title" required
@@ -45,17 +57,20 @@
                  placeholder="e.g., Finish report, Study Chapter 4, Gym session" />
         </div>
 
+        <!-- Description textarea -->
         <div class="col-12">
           <label class="form-label">Description <span class="opacity-75">(optional)</span></label>
           <textarea class="form-control" name="description" rows="3" placeholder="What exactly do you need to do?">{% if editing %}{{ task.description }}{% endif %}</textarea>
         </div>
 
+        <!-- Due date input -->
         <div class="col-12 col-md-4">
           <label class="form-label">Due date</label>
           <input class="form-control" type="date" name="due_date" required
                  value="{% if editing %}{{ task.due_date }}{% endif %}"/>
         </div>
 
+        <!-- Importance select -->
         <div class="col-12 col-md-4">
           <label class="form-label">Importance</label>
           <select class="form-select" name="importance">
@@ -66,6 +81,7 @@
           </select>
         </div>
 
+        <!-- Complexity select -->
         <div class="col-12 col-md-4">
           <label class="form-label">Complexity (1–5)</label>
           {% set cx = (task.complexity if editing else 1) %}
@@ -76,6 +92,7 @@
           </select>
         </div>
 
+        <!-- Energy level select -->
         <div class="col-12 col-md-4">
           <label class="form-label">Energy level (1–5)</label>
           {% set en = (task.energy if editing else 1) %}
@@ -88,6 +105,7 @@
         </div>
       </div>
 
+      <!-- Form buttons: Cancel and Submit -->
       <div class="d-flex justify-content-end gap-2 mt-4">
         <a class="btn btn-outline-secondary tm-primary-btn" href="{{ url_for('tasks_bp.task_list') }}">Cancel</a>
         <button class="btn btn-primary tm-primary-btn" type="submit">

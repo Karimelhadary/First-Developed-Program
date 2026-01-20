@@ -1,5 +1,5 @@
 
-/* Selector: body (styles for this element/class/id) */
+/* Styles for the body element: Applies a modern sans-serif font stack for readability, a linear gradient background from light blue to light purple for visual appeal, sets text color to dark gray, uses flexbox to center content vertically and horizontally, and ensures minimum height covers the full viewport. */
 body {
   font-family: "Segoe UI", Tahoma, sans-serif;
   background: linear-gradient(135deg, #f0faff, #e8e4ff);
@@ -10,7 +10,7 @@ body {
   min-height: 100vh;
 }
 
-/* Selector: header (styles for this element/class/id) */
+/* Styles for the header element: Defines a header that spans full width with a maximum width constraint, adds padding for spacing, and uses flexbox to justify content space-between (left and right alignment) while centering items vertically. */
 header {
   width: 100%;
   max-width: 800px;
@@ -20,14 +20,14 @@ header {
   align-items: center;
 }
 
-/* Selector: .back (styles for this element/class/id) */
+/* Styles for elements with class 'back': Removes text decoration from links, sets color to a blue shade, and makes the font bold for emphasis, likely used for back navigation links. */
 .back {
   text-decoration: none;
   color: #4a5cff;
   font-weight: bold;
 }
 
-/* Selector: .container (styles for this element/class/id) */
+/* Styles for elements with class 'container': Creates a white background container with padding, rounded corners, a subtle box shadow for depth, and responsive width with a maximum constraint for better layout on larger screens. */
 .container {
   background: #fff;
   padding: 25px;
@@ -37,14 +37,14 @@ header {
   max-width: 600px;
 }
 
-/* Selector: .task-form (styles for this element/class/id) */
+/* Styles for elements with class 'task-form': Uses flexbox in column direction with a gap between child elements to stack form inputs vertically with consistent spacing. */
 .task-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* Selector: label (styles for this element/class/id) */
+/* Styles for label elements: Displays labels as flex columns for stacking label text and associated inputs, sets bold font weight and dark color for better visibility and hierarchy. */
 label {
   display: flex;
   flex-direction: column;
@@ -52,7 +52,7 @@ label {
   color: #333;
 }
 
-/* Selector: input, textarea, select (styles for this element/class/id) */
+/* Styles for input, textarea, and select elements: Adds top margin for spacing from labels, padding inside for user comfort, a light gray border, and rounded corners for a modern look. */
 input, textarea, select {
   margin-top: 6px;
   padding: 10px;
@@ -60,13 +60,13 @@ input, textarea, select {
   border-radius: 6px;
 }
 
-/* Selector: textarea (styles for this element/class/id) */
+/* Styles for textarea elements: Prevents resizing by the user, sets a fixed height to maintain consistent form layout. */
 textarea {
   resize: none;
   height: 70px;
 }
 
-/* Selector: .actions (styles for this element/class/id) */
+/* Styles for elements with class 'actions': Uses flexbox to align action buttons to the right with a gap between them, and adds top margin for separation from the form. */
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -74,7 +74,7 @@ textarea {
   margin-top: 15px;
 }
 
-/* Selector: .btn (styles for this element/class/id) */
+/* Styles for elements with class 'btn': Provides base styling for buttons with padding, rounded corners, no text decoration, and bold font weight. */
 .btn {
   padding: 10px 16px;
   border-radius: 20px;
@@ -82,13 +82,13 @@ textarea {
   font-weight: bold;
 }
 
-/* Selector: .btn.primary (styles for this element/class/id) */
+/* Styles for elements with classes 'btn' and 'primary': Sets a blue background and white text for primary action buttons. */
 .btn.primary {
   background: #4a5cff;
   color: white;
 }
 
-/* Selector: .btn.ghost (styles for this element/class/id) */
+/* Styles for elements with classes 'btn' and 'ghost': Applies a blue border and blue text for secondary or ghost buttons. */
 .btn.ghost {
   border: 2px solid #4a5cff;
   color: #4a5cff;

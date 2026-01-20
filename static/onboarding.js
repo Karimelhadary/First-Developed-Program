@@ -1,24 +1,22 @@
 
-// static/onboarding.js - mood selection interactions
+// static/onboarding.js - Handles mood selection interactions on the onboarding page.
+// Allows users to select their current mood, updates UI accordingly.
 
-// Event listener: runs a function when the user triggers an event
-// Event listener: runs the callback when the event occurs
+// Wait for DOM to load before executing script
 document.addEventListener("DOMContentLoaded", function () {
+  // Log to console for debugging
   console.log("onboarding.js loaded");
 
-// DOM access: selecting HTML elements to read/update UI
+  // Select all mood label elements (containers for radio buttons)
   const moodLabels = document.querySelectorAll(".mood");
-// DOM access: selecting HTML elements to read/update UI
+  // Select the element that displays the selected mood text
   const selectedText = document.getElementById("mood-selected");
 
-// Function definition: reusable logic block
-
-  // -------------------------------
-  // Function block: read this as input -> processing -> output
-  // -------------------------------
+  // Function to update the displayed selected mood text with emoji
   function updateSelectedText(value) {
     if (!selectedText) return;
     let label = "";
+    // Switch statement to map mood values to labels with emojis
     switch (value) {
       case "energetic":
         label = "energetic ⚡";
@@ -35,29 +33,31 @@ document.addEventListener("DOMContentLoaded", function () {
       default:
         label = value;
     }
+    // Update the inner HTML with the selected mood
     selectedText.innerHTML = `Selected mood: <strong>${label}</strong>`;
   }
 
+  // Loop through each mood label
   moodLabels.forEach((label) => {
-// DOM access: selecting HTML elements to read/update UI
+    // Find the radio input inside the label
     const input = label.querySelector("input[type='radio']");
     if (!input) return;
 
-    // initial active state
-    // Control-flow: starts a 'if' block
+    // Check initial state: if radio is checked, make label active and update text
     if (input.checked) {
       label.classList.add("active");
       updateSelectedText(input.value);
     }
 
-// Event listener: runs a function when the user triggers an event
-    // Event listener: runs the callback when the event occurs
+    // Add click event listener to the label
     label.addEventListener("click", () => {
-      // clear all active
+      // Remove active class from all labels
       moodLabels.forEach((l) => l.classList.remove("active"));
-      // set this as active
+      // Add active class to clicked label
       label.classList.add("active");
+      // Check the radio button
       input.checked = true;
+      // Update the selected text display
       updateSelectedText(input.value);
     });
   });

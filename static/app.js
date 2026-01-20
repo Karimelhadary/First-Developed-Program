@@ -1,63 +1,60 @@
 
+// This is static/app.js - handles theme management for the application
 (() => {
+  // Key for storing theme in localStorage
   const KEY = "tm_theme";
+  // Reference to the root HTML element
   const root = document.documentElement;
 
-// Function definition: reusable logic block
-
-  // -------------------------------
-  // Function block: read this as input -> processing -> output
-  // -------------------------------
+  // Function to apply the theme to the document
   function apply(theme){
+    // Set the data-bs-theme attribute on root
     root.setAttribute("data-bs-theme", theme);
+    // Try to save to localStorage, ignore errors
     try { localStorage.setItem(KEY, theme); } catch(e){}
   }
 
-// Function definition: reusable logic block
-
-  // -------------------------------
-  // Function block: read this as input -> processing -> output
-  // -------------------------------
+  // Function to get the stored theme from localStorage
   function getStored(){
+    // Try to get from localStorage, return null on error
     try { return localStorage.getItem(KEY); } catch(e){ return null; }
   }
 
-  // boot
+  // On load, get stored theme
   const stored = getStored();
-  // Control-flow: starts a 'if(stored' block
+  // If stored theme is valid, apply it
   if(stored === "dark" || stored === "light"){
     apply(stored);
   }
 
-  // quick toggle (navbar button)
-// DOM access: selecting HTML elements to read/update UI
+  // Quick toggle button in navbar
   const btn = document.getElementById("quickTheme");
-  // Control-flow: starts a 'if(btn){' block
+  // If button exists, add click listener
   if(btn){
-// Event listener: runs a function when the user triggers an event
-    // Event listener: runs the callback when the event occurs
+    // On click, toggle between dark and light
     btn.addEventListener("click", () => {
       const current = root.getAttribute("data-bs-theme") || "light";
       apply(current === "dark" ? "light" : "dark");
     });
   }
 
-  // settings page toggle support
-// DOM access: selecting HTML elements to read/update UI
+  // Settings page toggle support
   const settingsToggle = document.getElementById("themeToggle");
-  // Control-flow: starts a 'if(settingsToggle){' block
+  // If settings toggle exists
   if(settingsToggle){
+    // Get current theme
     const current = root.getAttribute("data-bs-theme") || "light";
+    // Set checkbox checked state based on current theme
     settingsToggle.checked = current === "dark";
-// Event listener: runs a function when the user triggers an event
-    // Event listener: runs the callback when the event occurs
+    // Add change event listener to toggle
     settingsToggle.addEventListener("change", async () => {
+      // Determine next theme based on checkbox
       const next = settingsToggle.checked ? "dark" : "light";
+      // Apply the theme
       apply(next);
-      // best-effort persist to backend if endpoint exists
-      // Control-flow: starts a 'try{' block
+      // Try to persist to backend via API
       try{
-// Network request: fetch() calls an API endpoint and returns a Promise
+        // Send POST request to /api/settings with theme
         await fetch("/api/settings", {
           method:"POST",
           headers:{"Content-Type":"application/json"},

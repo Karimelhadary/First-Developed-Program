@@ -1,38 +1,30 @@
 
-// addtask.js - small helpers for the add/edit task form
-(function () {
-// Function definition: reusable logic block
+// addtask.js - Provides helper functions for the add/edit task form.
+// Specifically handles dynamic labels for range input sliders.
 
-  // -------------------------------
-  // Function block: read this as input -> processing -> output
-  // -------------------------------
+// Immediately invoked function expression (IIFE) to encapsulate code
+(function () {
+  // Function to attach a dynamic label to a range input showing its current value
   function attachRangeLabel(input) {
     if (!input) return;
-    // create label next to range if not present
-// DOM access: selecting HTML elements to read/update UI
+    // Create a span element for the value label if it doesn't exist
     let span = input.parentNode.querySelector('.range-value');
-    // Control-flow: starts a 'if' block
     if (!span) {
       span = document.createElement('span');
       span.className = 'range-value';
       input.parentNode.appendChild(span);
     }
-// Function definition: reusable logic block
 
-    // -------------------------------
-    // Function block: read this as input -> processing -> output
-    // -------------------------------
+    // Function to update the label with the current input value
     function update() { span.textContent = input.value; }
-// Event listener: runs a function when the user triggers an event
-    // Event listener: runs the callback when the event occurs
+    // Add event listener for input changes to update the label
     input.addEventListener('input', update);
+    // Initial update to set the label
     update();
   }
 
-// Event listener: runs a function when the user triggers an event
-  // Event listener: runs the callback when the event occurs
+  // Wait for DOM to load, then attach labels to all range inputs
   document.addEventListener('DOMContentLoaded', function () {
-// DOM access: selecting HTML elements to read/update UI
     const ranges = document.querySelectorAll('input[type="range"]');
     ranges.forEach(attachRangeLabel);
   });

@@ -1,12 +1,14 @@
 
-/* Selector: * (styles for this element/class/id) */
+/* dashboard.css - Styles for the dashboard page, including layout, mood selection, tasks display, and responsive design */
+
+/* Universal selector reset: Removes default margins and padding from all elements to ensure consistent spacing, and sets box-sizing to border-box so padding and borders are included in the element's total width and height. */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Selector: body (styles for this element/class/id) */
+/* Body element styles: Sets a modern sans-serif font stack for readability, applies a diagonal gradient background from light blue to light purple for aesthetic appeal, uses dark gray text color, ensures the body covers at least the full viewport height, and employs flexbox in column direction to stack child elements vertically. */
 body {
   font-family: "Segoe UI", Tahoma, sans-serif;
   background: linear-gradient(140deg, #f0faff, #f3e8ff);
@@ -16,7 +18,7 @@ body {
   flex-direction: column;
 }
 
-/* Selector: header (styles for this element/class/id) */
+/* Header element styles: Provides a white background for contrast, adds padding for internal spacing, uses flexbox to distribute space between logo/title and user info, centers items vertically, and includes a subtle bottom shadow for depth. */
 header {
   background: white;
   padding: 18px 25px;
@@ -26,19 +28,19 @@ header {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Selector: header h1 (styles for this element/class/id) */
+/* Header h1 styles: Increases font size for the main title and sets a darker color for better hierarchy. */
 header h1 {
   font-size: 22px;
   color: #333;
 }
 
-/* Selector: header p (styles for this element/class/id) */
+/* Header p styles: Uses a lighter gray color and smaller font size for secondary text like user info. */
 header p {
   color: #666;
   font-size: 14px;
 }
 
-/* Selector: main (styles for this element/class/id) */
+/* Main element styles: Allows the main content to grow and fill available space, constrains width to 90% with a maximum for larger screens, and centers it horizontally with auto margins. */
 main {
   flex: 1;
   width: 90%;
@@ -46,7 +48,7 @@ main {
   margin: 25px auto;
 }
 
-/* Selector: .mood-bar (styles for this element/class/id) */
+/* Mood bar container styles: Uses flexbox with wrapping to arrange mood selection buttons in a row that wraps to new lines, adds gap between buttons, and provides bottom margin for separation. */
 .mood-bar {
   display: flex;
   flex-wrap: wrap;
@@ -54,7 +56,7 @@ main {
   margin-bottom: 25px;
 }
 
-/* Selector: .mood-bar button (styles for this element/class/id) */
+/* Mood bar button styles: Makes buttons flexible to share space equally, sets minimum width, light green background with matching border, rounded corners, padding for touch targets, bold font weight, cursor pointer for interactivity, smooth transition for hover effects, and dark text color. */
 .mood-bar button {
   flex: 1;
   min-width: 100px;
@@ -68,19 +70,19 @@ main {
   color: #333;
 }
 
-/* Selector: .mood-bar button.active (styles for this element/class/id) */
+/* Active mood button styles: Changes background and border to purple, and text to white to indicate selection. */
 .mood-bar button.active {
   background: #5c45ff;
   color: white;
   border-color: #5c45ff;
 }
 
-/* Selector: .mood-bar button:hover (styles for this element/class/id) */
+/* Mood button hover styles: Lightens the background on hover for visual feedback. */
 .mood-bar button:hover {
   background: #dceffd;
 }
 
-/* Selector: .tasks (styles for this element/class/id) */
+/* Tasks section styles: White background for content area, padding for spacing, rounded corners, shadow for elevation, and bottom margin for separation from other sections. */
 .tasks {
   background: white;
   padding: 20px;
@@ -89,13 +91,13 @@ main {
   margin-bottom: 25px;
 }
 
-/* Selector: .tasks h3 (styles for this element/class/id) */
+/* Tasks heading styles: Adds bottom margin for spacing below the title and uses dark color for emphasis. */
 .tasks h3 {
   margin-bottom: 12px;
   color: #333;
 }
 
-/* Selector: .task-list (styles for this element/class/id) */
+/* Task list styles: Removes default list styling, uses flexbox in column direction to stack tasks vertically, and adds gap between list items. */
 .task-list {
   list-style: none;
   display: flex;
@@ -103,7 +105,7 @@ main {
   gap: 12px;
 }
 
-/* Selector: .task (styles for this element/class/id) */
+/* Individual task item styles: Light purple background, thin border, rounded corners, flexbox to space content between left and right, padding for internal spacing, and smooth transition for hover effects. */
 .task {
   background: #f6f6ff;
   border: 1px solid #ddd;
@@ -115,7 +117,7 @@ main {
   transition: 0.2s;
 }
 
-/* Selector: .task:hover (styles for this element/class/id) */
+/* Task hover styles: Darkens the background slightly on hover for interactivity feedback. */
 .task:hover {
   background: #ebe9ff;
 }
